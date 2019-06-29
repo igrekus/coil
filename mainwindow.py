@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
     def _draw(self):
         self.scene.addRect(0, 0, 2, 2)
 
+        # https://buildmedia.readthedocs.org/media/pdf/euclid/latest/euclid.pdf   -   geometry lib
         # https://stackoverflow.com/questions/11331854/how-can-i-generate-an-arc-in-numpy
         lens = list()
         x0, y0, = 0, 0
@@ -63,8 +64,13 @@ class MainWindow(QMainWindow):
                 r = sqrt(pow(x1 - i, 2) + pow(y1 - j, 2)) * zoom
                 self.scene.addEllipse(center_x * zoom - r, center_y * zoom - r, r * 2, r * 2)
             else:
-                print(params)
-                self.scene.addLine(x0 * zoom, y0 * zoom, x1 * zoom, y1 * zoom)
+                i, j = params['I'], -params['J']
+                center_x = i
+                center_y = j
+                self.scene.addRect(center_x * zoom, center_y * zoom, 2, 2)
+                r = sqrt(pow(x1 - i, 2) + pow(y1 - j, 2)) * zoom
+                self.scene.addEllipse(center_x * zoom - r, center_y * zoom - r, r * 2, r * 2)
+
             lens.append(sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2)))
             x0, y0 = x1, y1
 
