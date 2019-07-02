@@ -28,8 +28,9 @@ class MainWindow(QMainWindow):
 
 
     def parse_cnc(self):
-        filename = 'vteslin.cnc'
+        # filename = 'vteslin.cnc'
         # filename = 'vmedved.cnc'
+        filename = 'D:\work\python\coil\VMEDVED.CNC'
         with open(filename, 'rt') as f:
             for text_line in f.readlines():
                 text_line.replace(r'\\', '#')
