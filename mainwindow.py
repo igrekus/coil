@@ -50,14 +50,17 @@ class MainWindow(QMainWindow):
         # https://stackoverflow.com/questions/11331854/how-can-i-generate-an-arc-in-numpy
         lens = list()
         x0, y0, = 0, 0
-        zoom = 10
+        zoom = 1
         for path in self._cnc_paths:
             params = path.block.gcodes[0].get_param_dict()
+            if 'X' not in params or 'Y' not in params:
+                continue
             x1, y1 = params['X'], -params['Y']
             if isinstance(path.block.gcodes[0], GCodeLinearMove):
                 self.scene.addLine(x0 * zoom, y0 * zoom, x1 * zoom, y1 * zoom)
             elif isinstance(path.block.gcodes[0], GCodeArcMoveCW):
-                # print(params)
+                if 'I' not in params or 'J' not in params:
+                    continue
                 i, j = params['I'], -params['J']
                 center_x = i
                 center_y = j
@@ -65,6 +68,8 @@ class MainWindow(QMainWindow):
                 r = sqrt(pow(x1 - i, 2) + pow(y1 - j, 2)) * zoom
                 self.scene.addEllipse(center_x * zoom - r, center_y * zoom - r, r * 2, r * 2)
             else:
+                if 'I' not in params or 'J' not in params:
+                    continue
                 i, j = params['I'], -params['J']
                 center_x = i
                 center_y = j
