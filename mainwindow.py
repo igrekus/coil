@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGraphicsView, QGraphicsRectItem, QGraphicsScene
 from pygcode import Line, GCodeMotion, GCodeLinearMove, GCodeArcMoveCW
 
+import euclid3
 
 class MainWindow(QMainWindow):
 
@@ -22,10 +23,11 @@ class MainWindow(QMainWindow):
         self._ui.viewport.setScene(self.scene)
 
         self._cnc_paths = list()
+        self._geometry = list()
 
         self.parse_cnc()
+        self._build_geometry()
         self._draw()
-
 
     def parse_cnc(self):
         filename = './gcode/output_0002.ngc'
@@ -40,6 +42,36 @@ class MainWindow(QMainWindow):
                         self._cnc_paths.append(line)
                 except LookupError:
                     pass
+
+    def _build_geometry(self):
+        x0, y0, = 0, 0
+        for path in self._cnc_paths:
+            params = path.block.gcodes[0].get_param_dict()
+            if 'X' not in params or 'Y' not in params:
+                continue
+            x1, y1 = params['X'], -params['Y']
+            if isinstance(path.block.gcodes[0], GCodeLinearMove):
+                self._geometry.append(euclid3.Line2(euclid3.Point2(x0, y0), euclid3.Point2(x1, y1)))
+            elif isinstance(path.block.gcodes[0], GCodeArcMoveCW):
+                if 'I' not in params or 'J' not in params:
+                    continue
+                i, j = params['I'], -params['J']
+                center_x = i
+                center_y = j
+                self._geometry.append(euclid3.Circle(
+                    euclid3.Point2(center_x, center_y),
+                    sqrt(pow(x1 - i, 2) + pow(y1 - j, 2))
+                ))
+            else:
+                if 'I' not in params or 'J' not in params:
+                    continue
+                i, j = params['I'], -params['J']
+                center_x = i
+                center_y = j
+                self._geometry.append(euclid3.Circle(
+                    euclid3.Point2(center_x, center_y),
+                    sqrt(pow(x1 - i, 2) + pow(y1 - j, 2))
+                ))
 
     def _draw(self):
         self.scene.addRect(0, 0, 2, 2)
