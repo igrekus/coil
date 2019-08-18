@@ -9,6 +9,7 @@ from pygcode import Line, GCodeMotion, GCodeLinearMove, GCodeArcMoveCW
 
 import euclid3
 
+
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
