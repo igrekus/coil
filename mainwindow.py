@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
                     euclid3.Point2(center_x, center_y),
                     sqrt(pow(x1 - i, 2) + pow(y1 - j, 2))
                 ))
+            x0, y0 = x1, y1
 
     def _draw(self):
         self.scene.addRect(0, 0, 2, 2)
