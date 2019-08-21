@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
                 continue
             x1, y1 = params['X'], -params['Y']
             if isinstance(path.block.gcodes[0], GCodeLinearMove):
-                self._geometry.append(euclid3.Line2(euclid3.Point2(x0, y0), euclid3.Point2(x1, y1)))
+                self._geometry.append(euclid3.LineSegment2(euclid3.Point2(x0, y0), euclid3.Point2(x1, y1)))
             elif isinstance(path.block.gcodes[0], GCodeArcMoveCW):
                 if 'I' not in params or 'J' not in params:
                     continue
@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         # http://pycam.sourceforge.net/
         zoom = 10
         for line in self._geometry:
-            if isinstance(line, euclid3.Line2):
+            if isinstance(line, euclid3.LineSegment2):
                 self.scene.addLine(line.p1.x * zoom, line.p1.y * zoom, line.p2.x * zoom, line.p2.y * zoom)
             elif isinstance(line, euclid3.Circle):
                 self.scene.addRect(line.c.x * zoom, line.c.y * zoom, 2, 2)
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
         return sum([
             sqrt(pow(line.p2.x - line.p1.x, 2) + pow(line.p2.y - line.p1.y, 2))
             for line in self._geometry
-            if isinstance(line, euclid3.Line2)
+            if isinstance(line, euclid3.LineSegment2)
         ])
 
 a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
