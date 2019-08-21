@@ -80,39 +80,20 @@ class MainWindow(QMainWindow):
 
         # https://buildmedia.readthedocs.org/media/pdf/euclid/latest/euclid.pdf   -   geometry lib
         # https://stackoverflow.com/questions/11331854/how-can-i-generate-an-arc-in-numpy
-        lens = list()
-        x0, y0, = 0, 0
-        zoom = 1
-        for path in self._cnc_paths:
-            params = path.block.gcodes[0].get_param_dict()
-            if 'X' not in params or 'Y' not in params:
-                continue
-            x1, y1 = params['X'], -params['Y']
-            if isinstance(path.block.gcodes[0], GCodeLinearMove):
-                self.scene.addLine(x0 * zoom, y0 * zoom, x1 * zoom, y1 * zoom)
-            elif isinstance(path.block.gcodes[0], GCodeArcMoveCW):
-                if 'I' not in params or 'J' not in params:
-                    continue
-                i, j = params['I'], -params['J']
-                center_x = i
-                center_y = j
-                self.scene.addRect(center_x * zoom, center_y * zoom, 2, 2)
-                r = sqrt(pow(x1 - i, 2) + pow(y1 - j, 2)) * zoom
-                self.scene.addEllipse(center_x * zoom - r, center_y * zoom - r, r * 2, r * 2)
-            else:
-                if 'I' not in params or 'J' not in params:
-                    continue
-                i, j = params['I'], -params['J']
-                center_x = i
-                center_y = j
-                self.scene.addRect(center_x * zoom, center_y * zoom, 2, 2)
-                r = sqrt(pow(x1 - i, 2) + pow(y1 - j, 2)) * zoom
-                self.scene.addEllipse(center_x * zoom - r, center_y * zoom - r, r * 2, r * 2)
+        # http://pycam.sourceforge.net/
+        zoom = 10
+        for line in self._geometry:
+            if isinstance(line, euclid3.Line2):
+                self.scene.addLine(line.p1.x * zoom, line.p1.y * zoom, line.p2.x * zoom, line.p2.y * zoom)
+            elif isinstance(line, euclid3.Circle):
+                self.scene.addRect(line.c.x * zoom, line.c.y * zoom, 2, 2)
+                r = line.r * zoom
+                self.scene.addEllipse(line.c.x * zoom - r, line.c.y * zoom - r, r * 2, r * 2)
 
-            lens.append(sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2)))
-            x0, y0 = x1, y1
+    def _coil_length(self):
+        return sum([
 
-        print(sum(lens))
+            for line in self._geometry
 
 # http://pycam.sourceforge.net/
 
