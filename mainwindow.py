@@ -29,6 +29,7 @@ class MainWindow(QMainWindow):
         self.parse_cnc()
         self._build_geometry()
         self._draw()
+        print(self._coil_length())
 
     def parse_cnc(self):
         filename = './gcode/output_0002.ngc'
@@ -92,10 +93,10 @@ class MainWindow(QMainWindow):
 
     def _coil_length(self):
         return sum([
-
+            sqrt(pow(line.p2.x - line.p1.x, 2) + pow(line.p2.y - line.p1.y, 2))
             for line in self._geometry
-
-# http://pycam.sourceforge.net/
+            if isinstance(line, euclid3.Line2)
+        ])
 
 a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
                                                         "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",
