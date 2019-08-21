@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         self.scene = QGraphicsScene()
         self._ui.viewport.setScene(self.scene)
 
-        self._cnc_paths = list()
+        self._cnc = list()
         self._geometry = list()
 
         self.parse_cnc()
@@ -78,13 +78,13 @@ class MainWindow(QMainWindow):
                     code = line.block.gcodes[0]
                     if isinstance(code, GCodeMotion):
                         print('move', line.block.gcodes)
-                        self._cnc_paths.append(line)
+                        self._cnc.append(line)
                 except LookupError:
                     pass
 
     def _build_geometry(self):
         x0, y0, = 0, 0
-        for path in self._cnc_paths:
+        for path in self._cnc:
             params = path.block.gcodes[0].get_param_dict()
             if 'X' not in params or 'Y' not in params:
                 continue
