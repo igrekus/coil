@@ -1,5 +1,7 @@
 import datetime
 import os
+from copy import deepcopy
+
 import numpy
 import euclid3
 from PyQt5.QtSvg import QGraphicsSvgItem
@@ -168,8 +170,11 @@ class MainWindow(QMainWindow):
         output = Element(500, 500)  # size of the output file.
 
         lenin_x1 = Element('svg/lenin_silhuette.svg')
-        lenin_x0_95 = Element('svg/lenin_silhuette.svg').scale(0.95)
-        lenin_x0_90 = Element('svg/lenin_silhuette.svg').scale(0.91)
+        lenin_x0_95 = deepcopy(lenin_x1).scale(0.95)
+        lenin_x0_90 = deepcopy(lenin_x0_95).scale(0.95)
+
+        # lenin_x0_95 = Element('svg/lenin_silhuette.svg').scale(0.95)
+        # lenin_x0_90 = Element('svg/lenin_silhuette.svg').scale(0.91)
 
         output.placeat(lenin_x1, 0, 0)
         output.placeat(lenin_x0_95, 3.5, 3.5)
