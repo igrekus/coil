@@ -2,6 +2,7 @@ import datetime
 import os
 import numpy
 import euclid3
+from PyQt5.QtSvg import QGraphicsSvgItem
 
 from numpy import arccos, cos, sin, sqrt, arcsin, arctan2
 
@@ -73,10 +74,12 @@ class MainWindow(QMainWindow):
         self._cnc = list()
         self._geometry = list()
 
-        self.parse_cnc()
-        self._build_geometry()
-        self._draw()
-        print(self._coil_length())
+        # self.parse_cnc()
+        # self._build_geometry()
+        # self._draw()
+        # print(self._coil_length())
+
+        self._show_svg()
 
     def parse_cnc(self):
         # filename = './gcode/output_0002.ngc'
@@ -157,23 +160,87 @@ class MainWindow(QMainWindow):
     def _coil_length(self):
         return sum([line.length for line in self._geometry])
 
+    def _show_svg(self):
+        # svg = QGraphicsSvgItem('svg/lenin_silhuette.svg')
+        # self.scene.addItem(svg)
 
-a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
-                                                        "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",
-                                                        "win": "1090"},
-                                                       {"title": "CNC G Code: G02 and G03 – ManufacturingET.org",
-                                                        "url": "http://www.manufacturinget.org/2011/12/cnc-g-code-g02-and-g03/",
-                                                        "win": "1090"}, {
-                                                           "title": "Quick G-Code Arc Tutorial: Make G02 & G03 Easy, Avoid Mistakes",
-                                                           "url": "https://www.cnccookbook.com/cnc-g-code-arc-circle-g02-g03/",
-                                                           "win": "1090"}, {"title": "G-коды — Энциклопедия ТриДэшника",
-                                                                            "url": "https://3deshnik.ru/wiki/index.php/G-%D0%BA%D0%BE%D0%B4%D1%8B",
-                                                                            "win": "1090"},
-                                                       {"title": "Круговая интерполяция – G02 и G03",
-                                                        "url": "http://planetacam.ru/college/learn/6-3/",
-                                                        "win": "1090"}, {
-                                                           "title": "G-code.Описание.Программирование окружности.Команды G02 и G03",
-                                                           "url": "http://www.intuwiz.ru/articles/g02-g03.html#.XRYE3BYza3A",
-                                                           "win": "1090"}, {"title": "G-code.Описание.Команда G02",
-                                                                            "url": "http://www.intuwiz.ru/articles/g02.html#.XRYVTxYza3A",
-                                                                            "win": "1090"}], "created": 1561731977216}
+        from svgmanip import Element
+        output = Element(500, 500)  # size of the output file.
+
+        lenin_x1 = Element('svg/lenin_silhuette.svg')
+        lenin_x0_95 = Element('svg/lenin_silhuette.svg').scale(0.95)
+        lenin_x0_90 = Element('svg/lenin_silhuette.svg').scale(0.91)
+
+        output.placeat(lenin_x1, 0, 0)
+        output.placeat(lenin_x0_95, 3.5, 3.5)
+        output.placeat(lenin_x0_90, 6, 6)
+
+        output.dump('output.svg')
+        exit()
+        # output.save_as_png('output.png', 1024)
+
+# a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
+#                                                         "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",
+#                                                         "win": "1090"},
+#                                                        {"title": "CNC G Code: G02 and G03 – ManufacturingET.org",
+#                                                         "url": "http://www.manufacturinget.org/2011/12/cnc-g-code-g02-and-g03/",
+#                                                         "win": "1090"}, {
+#                                                            "title": "Quick G-Code Arc Tutorial: Make G02 & G03 Easy, Avoid Mistakes",
+#                                                            "url": "https://www.cnccookbook.com/cnc-g-code-arc-circle-g02-g03/",
+#                                                            "win": "1090"}, {"title": "G-коды — Энциклопедия ТриДэшника",
+#                                                                             "url": "https://3deshnik.ru/wiki/index.php/G-%D0%BA%D0%BE%D0%B4%D1%8B",
+#                                                                             "win": "1090"},
+#                                                        {"title": "Круговая интерполяция – G02 и G03",
+#                                                         "url": "http://planetacam.ru/college/learn/6-3/",
+#                                                         "win": "1090"}, {
+#                                                            "title": "G-code.Описание.Программирование окружности.Команды G02 и G03",
+#                                                            "url": "http://www.intuwiz.ru/articles/g02-g03.html#.XRYE3BYza3A",
+#                                                            "win": "1090"}, {"title": "G-code.Описание.Команда G02",
+#                                                                             "url": "http://www.intuwiz.ru/articles/g02.html#.XRYVTxYza3A",
+#                                                                             "win": "1090"}], "created": 1561731977216}
+#
+# b = {{"title": "py svg", "date": "28/8/2019", "tabs": [{"title": "PythonEffectTutorial - Inkscape Wiki",
+#                                                         "url": "http://wiki.inkscape.org/wiki/index.php/PythonEffectTutorial",
+#                                                         "win": "1610"}, {
+#                                                            "title": "Welcome to svgutils’s documentation! — svgutils 0.1 documentation",
+#                                                            "url": "https://svgutils.readthedocs.io/en/latest/",
+#                                                            "win": "1610"},
+#                                                        {"title": "Python Module Index — svgutils 0.1 documentation",
+#                                                         "url": "https://svgutils.readthedocs.io/en/latest/py-modindex.html",
+#                                                         "win": "1610"}, {
+#                                                            "title": "2.1. transform – basic SVG transformations — svgutils 0.1 documentation",
+#                                                            "url": "https://svgutils.readthedocs.io/en/latest/transform.html",
+#                                                            "win": "1610"}, {
+#                                                            "title": "2.2. compose – easy figure composing — svgutils 0.1 documentation",
+#                                                            "url": "https://svgutils.readthedocs.io/en/latest/compose.html",
+#                                                            "win": "1610"},
+#                                                        {"title": "pySVG - Creating SVG with Python - codeboje",
+#                                                         "url": "https://codeboje.de/pysvg/", "win": "1610"},
+#                                                        {"title": "pysvg · PyPI",
+#                                                         "url": "https://pypi.org/project/pysvg/#files", "win": "1610"},
+#                                                        {"title": "alorence/pysvg-py3: Python 3 portage of pysvg",
+#                                                         "url": "https://github.com/alorence/pysvg-py3", "win": "1610"},
+#                                                        {
+#                                                            "title": "cduck/drawSvg: A Python 3 library for programmatically generating SVG images (vector drawings) and rendering them or displaying them in an iPython notebook",
+#                                                            "url": "https://github.com/cduck/drawSvg", "win": "1610"}, {
+#                                                            "title": "stevelittlefish/easysvg: Simple SVG library for Python3",
+#                                                            "url": "https://github.com/stevelittlefish/easysvg",
+#                                                            "win": "1610"}, {
+#                                                            "title": "deeplook/svglib: Read SVG files and convert them to other formats.",
+#                                                            "url": "https://github.com/deeplook/svglib", "win": "1610"},
+#                                                        {
+#                                                            "title": "CrazyPython/svgmanip: A pythonic library for rotating, positioning, and exporting SVGs",
+#                                                            "url": "https://github.com/CrazyPython/svgmanip",
+#                                                            "win": "1610"}, {
+#                                                            "title": "mossblaser/svgoutline: A Python library which extracts strokes (outlines) from an SVG file as a series of line segments appropriate for driving pen plotters",
+#                                                            "url": "https://github.com/mossblaser/svgoutline",
+#                                                            "win": "1610"},
+#                                                        {"title": "nvictus/svgpath2mpl: SVG path parser for matplotlib",
+#                                                         "url": "https://github.com/nvictus/svgpath2mpl", "win": "1610"},
+#                                                        {
+#                                                            "title": "mathandy/svgpathtools: A collection of tools for manipulating and analyzing SVG Path objects and Bezier curves.",
+#                                                            "url": "https://github.com/mathandy/svgpathtools",
+#                                                            "win": "1610"},
+#                                                        {"title": "regebro/svg.path: SVG path objects and parser",
+#                                                         "url": "https://github.com/regebro/svg.path", "win": "1610"}],
+#       "created": 1567000613315}}
