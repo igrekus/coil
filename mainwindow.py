@@ -166,19 +166,26 @@ class MainWindow(QMainWindow):
         # svg = QGraphicsSvgItem('svg/lenin_silhuette.svg')
         # self.scene.addItem(svg)
 
+        w, h = 27.26, 27.26   # mm
+
         from svgmanip import Element
-        output = Element(500, 500)  # size of the output file.
+        output = Element(w, h)  # size of the output file.
 
-        lenin_x1 = Element('svg/lenin_silhuette.svg')
-        lenin_x0_95 = deepcopy(lenin_x1).scale(0.95)
-        lenin_x0_90 = deepcopy(lenin_x0_95).scale(0.95)
+        d = 1   # mm
+        w_prev = w
 
-        # lenin_x0_95 = Element('svg/lenin_silhuette.svg').scale(0.95)
-        # lenin_x0_90 = Element('svg/lenin_silhuette.svg').scale(0.91)
+        # svg = Element('svg/rsquare.svg')
+        svg = Element('svg/lenin_silhuette.svg')
+        output.placeat(svg, 0, 0)
 
-        output.placeat(lenin_x1, 0, 0)
-        output.placeat(lenin_x0_95, 3.5, 3.5)
-        output.placeat(lenin_x0_90, 6, 6)
+        for i in range(3):
+            w_curr = w_prev - 2 * d
+            scale = w_curr / w_prev
+            svg = deepcopy(svg).scale(scale)
+
+            w_prev = w_curr
+
+            output.placeat(svg, d * i, d * i)
 
         output.dump('output.svg')
         exit()
