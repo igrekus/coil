@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg280"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="medved_lines.svg">
+  <defs
+     id="defs274" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="251.48306"
+     inkscape:cy="1002.5139"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="996"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1"
+     showguides="false"
+     inkscape:snap-global="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid116" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata277">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="stroke:#000000;stroke-width:0.02252964;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 3.188595,27.058433 7.8802665,22.316085 4.7186118,17.59424 7.8815854,11.250252 11.046398,8.0860988 15.785268,4.9084196 18.940746,3.3268027 28.433,4.9015855 l 5.539079,0.8006456 4.718745,0.013047 7.135488,2.3732751 4.705914,1.5473531 0.837174,-0.7483156 0.759429,-2.390745 3.166266,0.00762 0.81587,2.383987 2.339374,-0.8110836 3.172682,1.5886674 3.943375,0.7414505 0.815776,0.83974 -0.01672,1.601139 -2.378134,2.289428 1.587686,1.648019 -4.757822,1.610064 -3.935184,3.945097 -3.18405,-1.571849 -4.707892,3.094507 3.172461,7.914911 1.567594,1.598757 -1.552517,1.543549 -9.526233,0.0192 -1.602629,-4.7066 -1.555114,0.02129 0.02048,3.116582 0.787809,0.762616 -0.773752,0.8207 -9.513519,-0.02948 -0.780009,-2.346327 2.36089,-7.109675 -7.092595,2.417565 3.96524,7.100017 -9.522519,-0.04678 -2.388787,-7.168872 -4.706341,0.113387 0.02325,3.103689 3.142528,1.576063 0.781266,2.400873 -11.0595981,0.02489 z"
+       id="line116"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccc" />
+  </g>
+</svg>

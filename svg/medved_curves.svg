@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg783"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="medved_curves.svg">
+  <defs
+     id="defs777" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.627417"
+     inkscape:cx="190.32835"
+     inkscape:cy="1047.2084"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="996"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata780">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccccc"
+       inkscape:connector-curvature="0"
+       id="line387"
+       d="M10.018689 6.8869062L14.524616 3.8778236L17.509655 2.4026L26.499439 3.8900993L31.74094 4.6454091L36.215747 4.6531191L42.988452 6.9202698L47.420398 8.3662122L48.214092 7.6554764L48.930509 5.3858943L49.6691840625 4.74133906875L50.501782 4.54947795L51.2996819375 4.78051250625L51.934263 5.4046443L52.682476 7.6529052L54.920895 6.8910185L57.918438 8.3940821L61.653938 9.0920229L62.426003 9.8960275L62.432803 11.400144L60.922335 12.903709L60.6439274063 13.2626963281L60.53398425 13.629565125L60.6107389687 13.9979176094L60.892425 14.361356L61.66262 15.149694L57.159756 16.661491L56.1258148027 16.7888591543L55.2819046094 17.0386837344L54.6140463926 17.398181166L54.108261125 17.854567875L53.7505697793 18.3950602871L53.5269933281 19.0068748281L53.426269 20.393336L53.166173625 19.7138055156L52.826261 19.299130875L51.964785 18.883165L50.452513 18.877665L45.960038 21.839227L48.968876 29.339259L50.454372 30.855281L48.950703 32.310109L39.956493 32.320559L38.445425 27.888364L38.1258453594 27.4707940313L37.747362875 27.3341705L37.3550262031 27.4738687188L36.993884 27.885264L36.99403 30.84675L37.738727 31.580369L36.990368 32.332622L28.003781 32.320802L27.252964 30.091215L29.457794 24.863837L29.5035580469 24.2977522969L29.262355125 23.764826875L28.7558188906 23.4130202656L28.005583 23.390292L23.518728 24.888878L22.9057124687 25.552900375L22.6753325 26.32521825L22.8681002812 27.119402L23.524528 27.849022L26.519384 32.355622L16.808039 32.374692L13.763164 25.594217L13.0478701447 25.1368677324L12.2846122016 24.9898814844L11.5469349795 25.1167063379L10.9083832875 25.480790375L10.4425019346 26.0455816777L10.2228357297 26.7745283281L10.3229294818 27.6310784082L10.816328 28.57868L13.789058 30.081686L13.643582 32.393941L4.0686531 32.363851L2.6012373 24.858137L7.0310249 20.373738L3.7448075 15.788583L7.0452919 9.8907365L10.018689 6.8869062"
+       style="fill:#000000;fill-opacity:0.25454544;stroke:#00ff57;stroke-width:0.04487904" />
+  </g>
+</svg>
