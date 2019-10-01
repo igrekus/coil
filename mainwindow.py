@@ -1,20 +1,17 @@
-import datetime
-import os
 from copy import deepcopy
 
 import numpy
 import euclid3
-from PyQt5.QtSvg import QGraphicsSvgItem
 
-from numpy import arccos, cos, sin, sqrt, arcsin, arctan2
+from numpy import arccos, cos, sin, sqrt, arctan2
 
 from PyQt5 import uic
-from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGraphicsView, QGraphicsRectItem, QGraphicsScene, \
-    QGraphicsLineItem, QGraphicsEllipseItem
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem
 
 from pygcode import Line, GCodeMotion, GCodeLinearMove, GCodeArcMoveCW, GCodeArcMoveCCW
 
+from gcodemodel import GcodeModel
 
 zoom = 20
 
@@ -70,11 +67,15 @@ class MainWindow(QMainWindow):
 
         # create instance variables
         self._ui = uic.loadUi("mainwindow.ui", self)
+
         self.scene = QGraphicsScene()
         self._ui.viewport.setScene(self.scene)
 
         self._cnc = list()
         self._geometry = list()
+
+        self._gcodeModel = GcodeModel(parent=self)
+        self._ui.tableGcode.setModel(self._gcodeModel)
 
         # self.parse_cnc()
         # self._build_geometry()
@@ -82,6 +83,8 @@ class MainWindow(QMainWindow):
         # print(self._coil_length())
 
         self._show_svg()
+
+        self._ui.tableGcode.resizeColumnsToContents()
 
     def parse_cnc(self):
         # filename = './gcode/output_0002.ngc'
@@ -165,7 +168,7 @@ class MainWindow(QMainWindow):
     def _show_svg(self):
         # svg = QGraphicsSvgItem('svg/lenin_silhuette.svg')
         # self.scene.addItem(svg)
-
+        return
         w, h = 27.26, 27.26   # mm
 
         from svgmanip import Element
