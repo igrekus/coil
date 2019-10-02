@@ -1,7 +1,28 @@
+import math
 import os
 
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
+from PyQt5.QtGui import QBrush, QColor
 from pygcode import Line
+
+
+COLOR_DISABLED = '#F5F5F5'
+GCODE_COMMAND_LABELS = {
+    'M70': 'Weld',
+    'M71': 'Sono up',
+    'M72': 'Sono mid',
+    'M73': 'Sono low',
+    'M74': 'Cut wire',
+    'M75': 'Embed on',
+    'M76': 'Embed off',
+    'M77': 'Pull wire',
+    'M78': 'Hold module',
+    'M79': 'Release module',
+    'M80': 'Brake on',
+    'M81': 'Brake off',
+    'M82': 'Thermode mid',
+    'M83': 'Thermode up'
+}
 
 
 class Command:
@@ -29,13 +50,12 @@ class Command:
             self._command = 'Старт'
         elif self._text == 'G90':
             self._gcode = 'G90'
-            self._command = 'Абс'
+            self._command = 'Абсолют'
         elif self._text == 'M30':
             self._gcode = 'M30'
             self._command = 'Конец'
         elif self._text.startswith('N'):
             ts = self._text.split('\n')
-            print(ts)
             if len(ts) == 1:
                 params = ts[0].split(' ')
                 self._index = int(params[0][1:4])
@@ -72,8 +92,45 @@ class Command:
                 elif gcode == 'M83':
                     self._command = 'Thermode up'
 
-            else:
+            elif len(ts) == 2:
+                line1, line2 = ts
+                params = line1.split(' ')
+                self._index = int(params[0][1:4])
+                self._gcode = 'M501'
+                self._command = 'Fill'
+                self._spill = int(params[2][1:])
+                self._delay = int(float(params[3][1:]) * 1000)
+
+            elif len(ts) == 3:
+                # print(ts)
+                line1, line2, line3 = ts
+                self._index = int(line1[1:4])
+                self._spill = int(line1[11:])
+                self._speed = int(line2[1:])
+
+                gcode, *params = line3.split(' ')
+
+                self._gcode = gcode
+
+                self._x = float(params[0][1:])
+                self._y = float(params[1][1:])
+                if len(params) == 3:
+                    self._command = 'Line To'
+                    self._r = '*'
+                elif len(params) == 6:
+                    if gcode == 'G03':
+                        self._command = 'CCW Arc To'
+                    elif gcode == 'G02':
+                        self._command = 'CW Arc To'
+                    self._arc = 'Short'
+                    i, j = float(params[3][1:]), float(params[4][1:])
+                    self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
+
+                print(self._gcode, params)
+
+            elif len(ts) == 4:
                 pass
+                # print(ts)
 
     def __str__(self):
         return f'Command(text={self._text})'
@@ -99,14 +156,18 @@ class Command:
             return self._delay
         elif item == 9:
             return self._pm
+        elif item == 'gcode':
+            return self._gcode
 
 
 class GcodeModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self._gcode_file = "C:\\devtools\\CNCoil\\CNCFILES\\vtest.cnc"
-        # self._gcode_file = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
+        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vtest.cnc"
+        self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
+        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
+        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
 
         self._headers = list()
         self._data = list()
@@ -115,14 +176,14 @@ class GcodeModel(QAbstractTableModel):
 
         self._init()
 
-    def clear(self):
-        self.beginRemoveRows(QModelIndex(), 0, len(self._data))
-        self._data.clear()
-        self.endRemoveRows()
-
     def _init(self):
-        if os.path.isfile(self._gcode_file):
-            with open(self._gcode_file, mode='rt') as f:
+        self.loadDesign(self.currentFile)
+
+    def loadDesign(self, filename):
+        self._commands.clear()
+
+        if os.path.isfile(filename):
+            with open(filename, mode='rt') as f:
                 command_block = ''
                 for l in f.readlines():
                     l = l.strip()
@@ -145,6 +206,9 @@ class GcodeModel(QAbstractTableModel):
                     else:
                         command_block += '\n' + l
 
+        self._updateModel()
+
+    def _updateModel(self):
         self.beginResetModel()
         self._headers = ['#', 'Command', 'X mm', 'Y mm', 'R mm', 'Arc', 'Speed', 'Spill', 'Delay', 'Pm']
         self._data = self._commands
@@ -210,10 +274,46 @@ class GcodeModel(QAbstractTableModel):
                 return QVariant()
             return QVariant(str(self._data[row][col]))
 
+        if role == Qt.BackgroundRole:
+            row = index.row()
+            col = index.column()
+
+            if row == 0 or row == 1 or row == len(self._data) - 1:
+                return QVariant(QBrush(QColor(COLOR_DISABLED)))
+
+            command = self._data[row]['gcode']
+            if command == 'G01':
+                if col in (5, 8, 9):
+                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
+
+            if command == 'G02' or command == 'G03':
+                if col in (8, 9):
+                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
+
+            if command in GCODE_COMMAND_LABELS:
+                if col in range(2, 9):
+                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
+
         return QVariant()
 
-    # def flags(self, index):
-    #     f = super(BillTableModel, self).flags(index)
-    #     if index.column() == self.ColumnActive or index.column() == self.ColumnStatus:
-    #         f = f | Qt.ItemIsUserCheckable
-    #     return f
+    def flags(self, index):
+        f = super().flags(index)
+        row = index.row()
+        col = index.column()
+
+        if col == 0:
+            return f ^ Qt.ItemIsEnabled
+
+        if row == 0 or row == 1 or row == len(self._data) - 1:
+            return f ^ Qt.ItemIsEnabled
+
+        command = self._data[row]['gcode']
+        if command == 'G01':
+            if col in (5, 8, 9):
+                return f ^ Qt.ItemIsEnabled
+
+        if command in GCODE_COMMAND_LABELS:
+            if col in range(2, 9):
+                return f ^ Qt.ItemIsEnabled
+
+        return f
