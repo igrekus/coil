@@ -127,8 +127,40 @@ class Command:
                     self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
 
             elif len(ts) == 4:
-                pass
-                # print(ts)
+                line1, line2, line3, line4 = ts
+                self._index = int(line1[1:4])
+                self._spill = int(line1[11:])
+                self._speed = int(line2[1:])
+
+                gcode1, *params1 = line3.split(' ')
+                gcode2, *params2 = line4.split(' ')
+
+                if gcode1 != 'G01' and gcode2 != 'G01':
+                    print(ts)
+                    # arc + arc = arc long
+                    if gcode1 == 'G02':
+                        self._label = 'CW Arc To (l)'
+                        self._gcode = 'G02'
+                    elif gcode1 == 'G03':
+                        self._gcode = 'G03'
+                        self._label = 'CCW Arc To (l)'
+
+                    self._arc = 'Long'
+
+                    self._x = float(params2[0][1:])
+                    self._y = float(params2[1][1:])
+
+                    i1, j1 = float(params1[3][1:]), float(params1[4][1:])
+                    r1 = round(math.sqrt(pow(float(params1[0][1:]) - i1, 2) + pow(float(params1[1][1:]) - j1, 2)))
+                    self._r = r1
+
+                    # i2, j2 = float(params2[3][1:]), float(params2[4][1:])
+                    # r2 = round(math.sqrt(pow(self._x - i2, 2) + pow(self._y - j2, 2)))
+
+                else:
+                    # line + arc
+                    pass
+
 
     def __str__(self):
         return f'Command(text={self._text})'
@@ -311,7 +343,11 @@ class GcodeModel(QAbstractTableModel):
             if col in (5, 8, 9):
                 return f ^ Qt.ItemIsEnabled
 
-        if command in GCODE_COMMAND_LABELS:
+        elif command == 'G02' or command == 'G03':
+            if col in (8, 9):
+                return f ^ Qt.ItemIsEnabled
+
+        elif command in GCODE_COMMAND_LABELS:
             if col in range(2, 9):
                 return f ^ Qt.ItemIsEnabled
 
