@@ -41,6 +41,7 @@ class Command:
         self._pm = ''
 
         self._gcode = ''
+        self._moves = list()
 
         self._parse()
 
