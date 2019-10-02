@@ -102,7 +102,6 @@ class Command:
                 self._delay = int(float(params[3][1:]) * 1000)
 
             elif len(ts) == 3:
-                # print(ts)
                 line1, line2, line3 = ts
                 self._index = int(line1[1:4])
                 self._spill = int(line1[11:])
@@ -125,8 +124,6 @@ class Command:
                     self._arc = 'Short'
                     i, j = float(params[3][1:]), float(params[4][1:])
                     self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
-
-                print(self._gcode, params)
 
             elif len(ts) == 4:
                 pass
