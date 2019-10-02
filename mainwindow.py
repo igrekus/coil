@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 
 import numpy
@@ -6,8 +7,8 @@ import euclid3
 from numpy import arccos, cos, sin, sqrt, arctan2
 
 from PyQt5 import uic
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem
+from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QFileDialog
 
 from pygcode import Line, GCodeMotion, GCodeLinearMove, GCodeArcMoveCW, GCodeArcMoveCCW
 
@@ -84,6 +85,10 @@ class MainWindow(QMainWindow):
 
         self._show_svg()
 
+        self._init()
+
+    def _init(self):
+        self._ui.editGcodeFile.setText(self._gcodeModel.currentFile)
         self._ui.tableGcode.resizeColumnsToContents()
 
     def parse_cnc(self):
@@ -193,6 +198,18 @@ class MainWindow(QMainWindow):
         output.dump('output.svg')
         exit()
         # output.save_as_png('output.png', 1024)
+
+    @pyqtSlot()
+    def on_btnOpenGcodeFile_clicked(self):
+        filename, _ = QFileDialog.getOpenFileName(parent=self,
+                                                  caption='Открыть дизайн...',
+                                                  directory=self._gcodeModel.currentDir,
+                                                  filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
+
+        self._gcodeModel.currentDir = os.path.dirname(filename)
+
+        self._gcodeModel.loadDesign(filename)
+        self._ui.editGcodeFile.setText(os.path.normpath(filename))
 
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
 #                                                         "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",

@@ -168,6 +168,7 @@ class GcodeModel(QAbstractTableModel):
         self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
+        self.currentDir = 'C:\\devtools\\CNCoil\\CNCFILES'
 
         self._headers = list()
         self._data = list()
