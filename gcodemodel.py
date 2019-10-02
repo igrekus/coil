@@ -29,7 +29,7 @@ class Command:
     def __init__(self, text):
         self._text: str = text.strip()
 
-        self._command = ''
+        self._label = ''
         self._index = ''
         self._x = ''
         self._y = ''
@@ -47,13 +47,13 @@ class Command:
     def _parse(self):
         if self._text == 'G71':
             self._gcode = 'G71'
-            self._command = 'Старт'
+            self._label = 'Старт'
         elif self._text == 'G90':
             self._gcode = 'G90'
-            self._command = 'Абсолют'
+            self._label = 'Абсолют'
         elif self._text == 'M30':
             self._gcode = 'M30'
-            self._command = 'Конец'
+            self._label = 'Конец'
         elif self._text.startswith('N'):
             ts = self._text.split('\n')
             if len(ts) == 1:
@@ -64,40 +64,40 @@ class Command:
 
                 gcode = params[1]
                 if gcode == 'M70':
-                    self._command = 'Weld'
+                    self._label = 'Weld'
                 elif gcode == 'M71':
-                    self._command = 'Sono up'
+                    self._label = 'Sono up'
                 elif gcode == 'M72':
-                    self._command = 'Sono mid'
+                    self._label = 'Sono mid'
                 elif gcode == 'M73':
-                    self._command = 'Sono low'
+                    self._label = 'Sono low'
                 elif gcode == 'M74':
-                    self._command = 'Cut wire'
+                    self._label = 'Cut wire'
                 elif gcode == 'M75':
-                    self._command = 'Embed on'
+                    self._label = 'Embed on'
                 elif gcode == 'M76':
-                    self._command = 'Embed off'
+                    self._label = 'Embed off'
                 elif gcode == 'M77':
-                    self._command = 'Pull wire'
+                    self._label = 'Pull wire'
                 elif gcode == 'M78':
-                    self._command = 'Hold module'
+                    self._label = 'Hold module'
                 elif gcode == 'M79':
-                    self._command = 'Release module'
+                    self._label = 'Release module'
                 elif gcode == 'M80':
-                    self._command = 'Brake on'
+                    self._label = 'Brake on'
                 elif gcode == 'M81':
-                    self._command = 'Brake off'
+                    self._label = 'Brake off'
                 elif gcode == 'M82':
-                    self._command = 'Thermode mid'
+                    self._label = 'Thermode mid'
                 elif gcode == 'M83':
-                    self._command = 'Thermode up'
+                    self._label = 'Thermode up'
 
             elif len(ts) == 2:
                 line1, line2 = ts
                 params = line1.split(' ')
                 self._index = int(params[0][1:4])
                 self._gcode = 'M501'
-                self._command = 'Fill'
+                self._label = 'Fill'
                 self._spill = int(params[2][1:])
                 self._delay = int(float(params[3][1:]) * 1000)
 
@@ -115,13 +115,13 @@ class Command:
                 self._x = float(params[0][1:])
                 self._y = float(params[1][1:])
                 if len(params) == 3:
-                    self._command = 'Line To'
+                    self._label = 'Line To'
                     self._r = '*'
                 elif len(params) == 6:
                     if gcode == 'G03':
-                        self._command = 'CCW Arc To'
+                        self._label = 'CCW Arc To'
                     elif gcode == 'G02':
-                        self._command = 'CW Arc To'
+                        self._label = 'CW Arc To'
                     self._arc = 'Short'
                     i, j = float(params[3][1:]), float(params[4][1:])
                     self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
@@ -139,7 +139,7 @@ class Command:
         if item == 0:
             return self._index
         elif item == 1:
-            return self._command
+            return self._label
         elif item == 2:
             return self._x
         elif item == 3:
