@@ -124,7 +124,7 @@ class Command:
                         self._label = 'CW Arc To (s)'
                     self._arc = 'Short'
                     i, j = float(params[3][1:]), float(params[4][1:])
-                    self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
+                    self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)), 1)
 
             elif len(ts) == 4:
                 line1, line2, line3, line4 = ts
@@ -150,7 +150,7 @@ class Command:
                     self._y = float(params2[1][1:])
 
                     i1, j1 = float(params1[3][1:]), float(params1[4][1:])
-                    r1 = round(math.sqrt(pow(float(params1[0][1:]) - i1, 2) + pow(float(params1[1][1:]) - j1, 2)))
+                    r1 = round(math.sqrt(pow(float(params1[0][1:]) - i1, 2) + pow(float(params1[1][1:]) - j1, 2)), 1)
                     self._r = r1
 
                     # i2, j2 = float(params2[3][1:]), float(params2[4][1:])
