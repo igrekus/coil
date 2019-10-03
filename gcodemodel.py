@@ -156,10 +156,22 @@ class Command:
                     # i2, j2 = float(params2[3][1:]), float(params2[4][1:])
                     # r2 = round(math.sqrt(pow(self._x - i2, 2) + pow(self._y - j2, 2)))
 
+                # line + arc = line with end curve
+                elif gcode1 == 'G01':
+                    print(ts)
+                    self._label = 'Line To (end)'
+                    self._gcode = 'G01'
+
+                    self._y = float(params1[1][1:])
+                    # self._r =
+
                 else:
                     # line + arc
                     pass
 
+            elif len(ts) == 5:
+                pass
+                # print('>', ts)
 
     def __str__(self):
         return f'Command(text={self._text})'
@@ -194,10 +206,10 @@ class GcodeModel(QAbstractTableModel):
         super().__init__(parent)
 
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vtest.cnc"
-        self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
-        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
+        # self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
+        self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
-        self.currentDir = 'C:\\devtools\\CNCoil\\CNCFILES'
+        self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
 
         self._headers = list()
         self._data = list()
