@@ -119,9 +119,9 @@ class Command:
                     self._r = '*'
                 elif len(params) == 6:
                     if gcode == 'G03':
-                        self._label = 'CCW Arc To'
+                        self._label = 'CCW Arc To (s)'
                     elif gcode == 'G02':
-                        self._label = 'CW Arc To'
+                        self._label = 'CW Arc To (s)'
                     self._arc = 'Short'
                     i, j = float(params[3][1:]), float(params[4][1:])
                     self._r = round(math.sqrt(pow(self._x - i, 2) + pow(self._y - j, 2)))
