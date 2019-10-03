@@ -135,9 +135,8 @@ class Command:
                 gcode1, *params1 = line3.split(' ')
                 gcode2, *params2 = line4.split(' ')
 
+                # arc + arc = arc long
                 if gcode1 != 'G01' and gcode2 != 'G01':
-                    print(ts)
-                    # arc + arc = arc long
                     if gcode1 == 'G02':
                         self._label = 'CW Arc To (l)'
                         self._gcode = 'G02'
