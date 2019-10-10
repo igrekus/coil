@@ -26,21 +26,24 @@ GCODE_COMMAND_LABELS = {
 
 
 class Command:
-    def __init__(self, text):
+    def __init__(self, text, previous=None):
         self._text: str = text.strip()
 
+        self._previous = previous
+
         self._label = ''
-        self._index = ''
-        self._x = ''
-        self._y = ''
-        self._r = ''
+        self._index = 0
+        self._x = 0
+        self._y = 0
+        self._r = 0
         self._arc = ''
-        self._speed = ''
-        self._spill = ''
-        self._delay = ''
-        self._pm = ''
+        self._speed = 0
+        self._spill = 0
+        self._delay = 0
+        self._pm = 0
 
         self._gcode = ''
+        self._comand_type = None
         self._moves = list()
 
         self._parse()
@@ -158,20 +161,34 @@ class Command:
 
                 # line + arc = line with end curve
                 elif gcode1 == 'G01':
-                    print(ts)
-                    self._label = 'Line To (end)'
+                    self._label = 'Line To (e)'
                     self._gcode = 'G01'
 
-                    self._y = float(params1[1][1:])
-                    # self._r =
+                    # if self._previous is not None:
+                    #     print('modding previous Line To (end)')
+                    #
+                    # cx, cy = float(params2[0][1:]), float(params2[1][1:])
+                    # i, j = float(params2[3][1:]), float(params2[4][1:])
+                    # r = self._r = round(math.sqrt(pow(cx - i, 2) + pow(cy - j, 2)), 1)
+                    #
+                    # x0, y0 = self._previous._x, self._previous._y
+                    #
+                    # dx = cx - x0
+                    # dy = cy - y0
+                    # l = math.sqrt(dx * dx + dy * dy)
+                    #
+                    # self._x = x0 + (dx * (l + r)) / l
+                    # self._y = y0 + (dy * (l + r)) / l
 
-                else:
-                    # line + arc
-                    pass
+                elif gcode2 == 'G01':
+                    self._label = 'Line To (s)'
+                    self._gcode = 'G01'
 
             elif len(ts) == 5:
-                pass
-                # print('>', ts)
+                line1, line2, line3, line4, line5 = ts
+                self._index = int(line1[1:4])
+                self._spill = int(line1[11:])
+                self._speed = int(line2[1:])
 
     def __str__(self):
         return f'Command(text={self._text})'
@@ -237,7 +254,7 @@ class GcodeModel(QAbstractTableModel):
                             command_block = l
                             continue
                         else:
-                            self._commands.append(Command(command_block))
+                            self._commands.append(Command(command_block, previous=self._commands[-1]))
                             command_block = l
                     elif 'G71' in l or 'G90' in l or 'M30' in l:
                         if command_block:
