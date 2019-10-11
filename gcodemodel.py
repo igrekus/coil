@@ -4,6 +4,7 @@ import os
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
 from PyQt5.QtGui import QBrush, QColor
 from pygcode import Line
+from euclid3 import Line2, Point2
 
 
 COLOR_DISABLED = '#F5F5F5'
@@ -43,6 +44,8 @@ class Command:
         self._pm = 0
 
         self._gcode = ''
+        self._gcode_x = 0
+        self._gcode_y = 0
         self._comand_type = None
         self._moves = list()
 
@@ -115,8 +118,8 @@ class Command:
 
                 self._gcode = gcode
 
-                self._x = float(params[0][1:])
-                self._y = float(params[1][1:])
+                self._gcode_x = self._x = float(params[0][1:])
+                self._gcode_y = self._y = float(params[1][1:])
                 if len(params) == 3:
                     self._label = 'Line To'
                     self._r = '*'
@@ -149,8 +152,8 @@ class Command:
 
                     self._arc = 'Long'
 
-                    self._x = float(params2[0][1:])
-                    self._y = float(params2[1][1:])
+                    self._gcode_x = self._x = float(params2[0][1:])
+                    self._gcode_y = self._y = float(params2[1][1:])
 
                     i1, j1 = float(params1[3][1:]), float(params1[4][1:])
                     r1 = round(math.sqrt(pow(float(params1[0][1:]) - i1, 2) + pow(float(params1[1][1:]) - j1, 2)), 1)
@@ -161,28 +164,56 @@ class Command:
 
                 # line + arc = line with end curve
                 elif gcode1 == 'G01':
+                    print(self._index, ts)
                     self._label = 'Line To (e)'
                     self._gcode = 'G01'
 
-                    # if self._previous is not None:
-                    #     print('modding previous Line To (end)')
-                    #
-                    # cx, cy = float(params2[0][1:]), float(params2[1][1:])
-                    # i, j = float(params2[3][1:]), float(params2[4][1:])
-                    # r = self._r = round(math.sqrt(pow(cx - i, 2) + pow(cy - j, 2)), 1)
-                    #
-                    # x0, y0 = self._previous._x, self._previous._y
-                    #
-                    # dx = cx - x0
-                    # dy = cy - y0
-                    # l = math.sqrt(dx * dx + dy * dy)
-                    #
-                    # self._x = x0 + (dx * (l + r)) / l
-                    # self._y = y0 + (dy * (l + r)) / l
+                    x1, y1 = self._previous._gcode_x, self._previous._gcode_y
+                    x2, y2 = float(params1[0][1:]), float(params1[1][1:])
+
+                    x3, y3 = float(params2[3][1:]), float(params2[4][1:])
+                    x4, y4 = float(params2[0][1:]), float(params2[1][1:])
+
+                    l1 = Line2(Point2(x1, y1), Point2(x2, y2))
+                    l2 = Line2(Point2(x3, y3), Point2(x4, y4))
+
+                    intersect: Point2 = l2.intersect(l1)
+
+                    self._x = round(intersect.x, 1)
+                    self._y = round(intersect.y, 1)
+                    self._r = round(math.sqrt(pow(x4 - x3, 2) + pow(y4 - y3, 2)), 1)
+
+                    self._gcode_x = x4
+                    self._gcode_y = y4
+
+                    # t12 = (y2 - y1) / (x2 - x1)
+                    # t34 = (y4 - y3) / (x4 - x3)
+                    # self._x = round((y3 - y1 + t12*x1 - t34*x3) / (t12 - t34), 1)
+                    # self._y = round(y1 + t12*self._x - t12*x1, 1)
 
                 elif gcode2 == 'G01':
+                    print(ts)
+
                     self._label = 'Line To (s)'
                     self._gcode = 'G01'
+
+                    x1, y1 = self._previous._gcode_x, self._previous._gcode_y
+                    x2, y2 = float(params1[3][1:]), float(params1[4][1:])
+
+                    x3, y3 = float(params1[0][1:]), float(params1[1][1:])
+                    x4, y4 = float(params2[0][1:]), float(params2[1][1:])
+
+                    l1 = Line2(Point2(x1, y1), Point2(x2, y2))
+                    l2 = Line2(Point2(x3, y3), Point2(x4, y4))
+
+                    intersect: Point2 = l2.intersect(l1)
+
+                    self._x = round(x4, 1)
+                    self._y = round(y4, 1)
+                    self._r = round(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)), 1)
+
+                    self._gcode_x = x4
+                    self._gcode_y = y4
 
             elif len(ts) == 5:
                 line1, line2, line3, line4, line5 = ts
@@ -258,7 +289,7 @@ class GcodeModel(QAbstractTableModel):
                             command_block = l
                     elif 'G71' in l or 'G90' in l or 'M30' in l:
                         if command_block:
-                            self._commands.append(Command(command_block))
+                            self._commands.append(Command(command_block, previous=self._commands[-1]))
                             command_block = ''
                         self._commands.append(Command(l))
                         continue
