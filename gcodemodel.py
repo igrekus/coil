@@ -191,6 +191,7 @@ class Command:
                     # self._x = round((y3 - y1 + t12*x1 - t34*x3) / (t12 - t34), 1)
                     # self._y = round(y1 + t12*self._x - t12*x1, 1)
 
+                # arc + line = line with start curve
                 elif gcode2 == 'G01':
                     print(ts)
 
