@@ -211,7 +211,8 @@ class Command:
 
                     self._x = round(x4, 1)
                     self._y = round(y4, 1)
-                    self._r = round(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)), 1)
+                    # self._r = round(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)), 1)
+                    self._r = '*'
 
                     self._gcode_x = x4
                     self._gcode_y = y4
