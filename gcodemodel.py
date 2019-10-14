@@ -4,6 +4,7 @@ import os
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
 from PyQt5.QtGui import QBrush, QColor
 from pygcode import Line
+from euclid3 import Line2, Point2
 
 
 COLOR_DISABLED = '#F5F5F5'
@@ -26,21 +27,26 @@ GCODE_COMMAND_LABELS = {
 
 
 class Command:
-    def __init__(self, text):
+    def __init__(self, text, previous=None):
         self._text: str = text.strip()
 
+        self._previous = previous
+
         self._label = ''
-        self._index = ''
-        self._x = ''
-        self._y = ''
-        self._r = ''
+        self._index = 0
+        self._x = 0
+        self._y = 0
+        self._r = 0
         self._arc = ''
-        self._speed = ''
-        self._spill = ''
-        self._delay = ''
-        self._pm = ''
+        self._speed = 0
+        self._spill = 0
+        self._delay = 0
+        self._pm = 0
 
         self._gcode = ''
+        self._gcode_x = 0
+        self._gcode_y = 0
+        self._comand_type = None
         self._moves = list()
 
         self._parse()
@@ -112,8 +118,8 @@ class Command:
 
                 self._gcode = gcode
 
-                self._x = float(params[0][1:])
-                self._y = float(params[1][1:])
+                self._gcode_x = self._x = float(params[0][1:])
+                self._gcode_y = self._y = float(params[1][1:])
                 if len(params) == 3:
                     self._label = 'Line To'
                     self._r = '*'
@@ -146,8 +152,8 @@ class Command:
 
                     self._arc = 'Long'
 
-                    self._x = float(params2[0][1:])
-                    self._y = float(params2[1][1:])
+                    self._gcode_x = self._x = float(params2[0][1:])
+                    self._gcode_y = self._y = float(params2[1][1:])
 
                     i1, j1 = float(params1[3][1:]), float(params1[4][1:])
                     r1 = round(math.sqrt(pow(float(params1[0][1:]) - i1, 2) + pow(float(params1[1][1:]) - j1, 2)), 1)
@@ -156,10 +162,66 @@ class Command:
                     # i2, j2 = float(params2[3][1:]), float(params2[4][1:])
                     # r2 = round(math.sqrt(pow(self._x - i2, 2) + pow(self._y - j2, 2)))
 
-                else:
-                    # line + arc
-                    pass
+                # line + arc = line with end curve
+                elif gcode1 == 'G01':
+                    print(self._index, ts)
+                    self._label = 'Line To (e)'
+                    self._gcode = 'G01'
 
+                    x1, y1 = self._previous._gcode_x, self._previous._gcode_y
+                    x2, y2 = float(params1[0][1:]), float(params1[1][1:])
+
+                    x3, y3 = float(params2[3][1:]), float(params2[4][1:])
+                    x4, y4 = float(params2[0][1:]), float(params2[1][1:])
+
+                    l1 = Line2(Point2(x1, y1), Point2(x2, y2))
+                    l2 = Line2(Point2(x3, y3), Point2(x4, y4))
+
+                    intersect: Point2 = l2.intersect(l1)
+
+                    self._x = round(intersect.x, 1)
+                    self._y = round(intersect.y, 1)
+                    self._r = round(math.sqrt(pow(x4 - x3, 2) + pow(y4 - y3, 2)), 1)
+
+                    self._gcode_x = x4
+                    self._gcode_y = y4
+
+                    # t12 = (y2 - y1) / (x2 - x1)
+                    # t34 = (y4 - y3) / (x4 - x3)
+                    # self._x = round((y3 - y1 + t12*x1 - t34*x3) / (t12 - t34), 1)
+                    # self._y = round(y1 + t12*self._x - t12*x1, 1)
+
+                # arc + line = line with start curve
+                elif gcode2 == 'G01':
+                    print(ts)
+
+                    self._label = 'Line To (s)'
+                    self._gcode = 'G01'
+
+                    x1, y1 = self._previous._gcode_x, self._previous._gcode_y
+                    x2, y2 = float(params1[3][1:]), float(params1[4][1:])
+
+                    x3, y3 = float(params1[0][1:]), float(params1[1][1:])
+                    x4, y4 = float(params2[0][1:]), float(params2[1][1:])
+
+                    l1 = Line2(Point2(x1, y1), Point2(x2, y2))
+                    l2 = Line2(Point2(x3, y3), Point2(x4, y4))
+
+                    intersect: Point2 = l2.intersect(l1)
+
+                    self._x = round(x4, 1)
+                    self._y = round(y4, 1)
+                    # self._r = round(math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)), 1)
+                    self._r = '*'
+
+                    self._gcode_x = x4
+                    self._gcode_y = y4
+
+            elif len(ts) == 5:
+                line1, line2, line3, line4, line5 = ts
+                self._index = int(line1[1:4])
+                self._spill = int(line1[11:])
+                self._speed = int(line2[1:])
 
     def __str__(self):
         return f'Command(text={self._text})'
@@ -194,10 +256,10 @@ class GcodeModel(QAbstractTableModel):
         super().__init__(parent)
 
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vtest.cnc"
-        self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
-        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
+        # self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
+        self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
-        self.currentDir = 'C:\\devtools\\CNCoil\\CNCFILES'
+        self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
 
         self._headers = list()
         self._data = list()
@@ -225,11 +287,11 @@ class GcodeModel(QAbstractTableModel):
                             command_block = l
                             continue
                         else:
-                            self._commands.append(Command(command_block))
+                            self._commands.append(Command(command_block, previous=self._commands[-1]))
                             command_block = l
                     elif 'G71' in l or 'G90' in l or 'M30' in l:
                         if command_block:
-                            self._commands.append(Command(command_block))
+                            self._commands.append(Command(command_block, previous=self._commands[-1]))
                             command_block = ''
                         self._commands.append(Command(l))
                         continue
