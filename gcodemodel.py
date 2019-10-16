@@ -164,7 +164,6 @@ class Command:
 
                 # line + arc = line with end curve
                 elif gcode1 == 'G01':
-                    print(self._index, ts)
                     self._label = 'Line To (e)'
                     self._gcode = 'G01'
 
@@ -193,8 +192,6 @@ class Command:
 
                 # arc + line = line with start curve
                 elif gcode2 == 'G01':
-                    print(ts)
-
                     self._label = 'Line To (s)'
                     self._gcode = 'G01'
 
