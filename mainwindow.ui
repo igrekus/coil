@@ -14,7 +14,7 @@
    <string>Coil</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -24,9 +24,9 @@
        <attribute name="title">
         <string>CNC</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,7">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,5">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
@@ -40,6 +40,101 @@
              <widget class="QLineEdit" name="editGcodeFile"/>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="grpInputParams">
+            <property name="title">
+             <string>Входные параметры</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lblWireGap">
+               <property name="text">
+                <string>Зазор</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="spinWireGap">
+               <property name="suffix">
+                <string> мм</string>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lblLoopCount">
+               <property name="text">
+                <string>Кол-во витков</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spinLoopCount"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lblWireDiameter">
+               <property name="text">
+                <string>Диаметр проводника</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="spinWireDiameter">
+               <property name="suffix">
+                <string> мм</string>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lblDielectricConst">
+               <property name="text">
+                <string>Диэлектрическая проницаемость</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="spinDielectricConst">
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lblMagneticConst">
+               <property name="text">
+                <string>Магнитная проницаемость</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="spinMagneticConst"/>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QTableView" name="tableGcode">
