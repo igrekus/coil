@@ -215,7 +215,6 @@ class Command:
                     self._gcode_y = y4
 
             elif len(ts) == 5:
-                print(ts)
                 line1, line2, line3, line4, line5 = ts
                 self._index = int(line1[1:4])
                 self._spill = int(line1[11:])
