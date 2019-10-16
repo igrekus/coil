@@ -218,10 +218,36 @@ class Command:
                     self._gcode_y = y4
 
             elif len(ts) == 5:
+                print(ts)
                 line1, line2, line3, line4, line5 = ts
                 self._index = int(line1[1:4])
                 self._spill = int(line1[11:])
                 self._speed = int(line2[1:])
+
+                gcode1, *params1 = line3.split(' ')
+                gcode2, *params2 = line4.split(' ')
+                gcode3, *params3 = line5.split(' ')
+
+                self._label = 'Line To (b)'
+                self._gcode = 'G01'
+
+                x1, y1 = float(params1[0][1:]), float(params1[1][1:])
+                x2, y2 = float(params2[0][1:]), float(params2[1][1:])
+
+                x3, y3 = float(params3[3][1:]), float(params3[4][1:])
+                x4, y4 = float(params3[0][1:]), float(params3[1][1:])
+
+                l1 = Line2(Point2(x1, y1), Point2(x2, y2))
+                l2 = Line2(Point2(x3, y3), Point2(x4, y4))
+
+                intersect: Point2 = l2.intersect(l1)
+
+                self._x = round(intersect.x, 1)
+                self._y = round(intersect.y, 1)
+                self._r = round(math.sqrt(pow(x4 - x3, 2) + pow(y4 - y3, 2)), 1)
+
+                self._gcode_x = x4
+                self._gcode_y = y4
 
     def __str__(self):
         return f'Command(text={self._text})'
