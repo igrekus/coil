@@ -248,6 +248,11 @@ class Command:
     def __str__(self):
         return f'Command(text={self._text})'
 
+    def __len__(self):
+        if self._gcode not in ['G01', 'G02', 'G03']:
+            return 0
+        return 100
+
     def __getitem__(self, item):
         if item == 0:
             return self._index
@@ -435,3 +440,10 @@ class GcodeModel(QAbstractTableModel):
                 return f ^ Qt.ItemIsEnabled
 
         return f
+
+    @property
+    def length(self):
+        lng = 0
+        for c in self._commands:
+            lng += len(c)
+        return lng

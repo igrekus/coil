@@ -131,7 +131,81 @@
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="spinMagneticConst"/>
+              <widget class="QDoubleSpinBox" name="spinMagneticConst">
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QPushButton" name="btnCalc">
+               <property name="text">
+                <string>Рассчитать</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="grpOutputParams">
+            <property name="title">
+             <string>Расчётные параметры</string>
+            </property>
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lblLength">
+               <property name="text">
+                <string>Длина</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="editLength"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lblCapacitance">
+               <property name="text">
+                <string>Ёмкость</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="editCapacitance"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lblInductance">
+               <property name="text">
+                <string>Индуктивность</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="editInductance"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lblFreq">
+               <property name="text">
+                <string>Частота</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="editFreq"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lblArea">
+               <property name="text">
+                <string>Площадь</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="editArea">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -191,7 +265,7 @@
      <x>0</x>
      <y>0</y>
      <width>1166</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
