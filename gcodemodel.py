@@ -6,6 +6,7 @@ from PyQt5.QtGui import QBrush, QColor
 from pygcode import Line
 from euclid3 import Line2, Point2
 
+from cncoilgcode import CNFile
 
 COLOR_DISABLED = '#F5F5F5'
 GCODE_COMMAND_LABELS = {
@@ -287,6 +288,8 @@ class GcodeModel(QAbstractTableModel):
         self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
         # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
         self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
+
+        self._cnFile = CNFile(filename=self.currentFile)
 
         self._headers = list()
         self._data = list()
