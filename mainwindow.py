@@ -226,6 +226,9 @@ class MainWindow(QMainWindow):
                                                   directory=self._gcodeModel.currentDir,
                                                   filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
 
+        if not filename:
+            return
+
         self._gcodeModel.currentDir = os.path.dirname(filename)
 
         self._gcodeModel.loadDesign(filename)
