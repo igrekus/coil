@@ -6,6 +6,5 @@ file = '../gcode/VCOMTEST.CNC'
 
 
 def test_parse_cnfile():
-    with open(file, 'rt') as f:
-        cnc = CNFile(f.readlines())
+    cnc = CNFile(file)
 
