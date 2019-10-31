@@ -318,6 +318,7 @@ class CNFile:
 
         self._header = list()
         self._commands = list()
+        self._cncommands = list()
         self._footer = list()
 
         self._load()
