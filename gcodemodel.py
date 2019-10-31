@@ -103,6 +103,9 @@ class GcodeModel(QAbstractTableModel):
         col = index.column()
         row = index.row()
 
+        if not self.flags(index) & Qt.ItemIsEnabled and col != 0:
+            return QVariant()
+
         if role == Qt.DisplayRole:
             if not self._data:
                 return QVariant()
@@ -119,6 +122,10 @@ class GcodeModel(QAbstractTableModel):
 
             if command == 'G02' or command == 'G03':
                 if col in (8, 9):
+                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
+
+            elif command == 'M501':
+                if col in (2, 3, 4, 5, 6, 9):
                     return QVariant(QBrush(QColor(COLOR_DISABLED)))
 
             if command in GCODE_COMMAND_LABELS:
@@ -142,6 +149,10 @@ class GcodeModel(QAbstractTableModel):
 
         elif command == 'G02' or command == 'G03':
             if col in (8, 9):
+                return f ^ Qt.ItemIsEnabled
+
+        elif command == 'M501':
+            if col in (2, 3, 4, 5, 6, 9):
                 return f ^ Qt.ItemIsEnabled
 
         elif command in GCODE_COMMAND_LABELS:
