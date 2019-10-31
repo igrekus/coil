@@ -97,6 +97,7 @@ class MainWindow(QMainWindow):
 
         self._gcodeModel = GcodeModel(parent=self)
         self._ui.tableGcode.setModel(self._gcodeModel)
+        self._currentDir = '.'
 
         # self.parse_cnc()
         # self._build_geometry()
@@ -223,13 +224,13 @@ class MainWindow(QMainWindow):
     def on_btnOpenGcodeFile_clicked(self):
         filename, _ = QFileDialog.getOpenFileName(parent=self,
                                                   caption='Открыть дизайн...',
-                                                  directory=self._gcodeModel.currentDir,
+                                                  directory=self._currentDir,
                                                   filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
 
         if not filename:
             return
 
-        self._gcodeModel.currentDir = os.path.dirname(filename)
+        self._currentDir = os.path.dirname(filename)
 
         self._gcodeModel.loadDesign(filename)
         self._ui.editGcodeFile.setText(os.path.normpath(filename))
