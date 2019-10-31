@@ -1,10 +1,5 @@
-import math
-import os
-
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
 from PyQt5.QtGui import QBrush, QColor
-from pygcode import Line
-from euclid3 import Line2, Point2
 
 from cncoilgcode import CNFile
 
