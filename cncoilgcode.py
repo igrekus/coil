@@ -1,7 +1,13 @@
 import os
 import math
 
+from enum import Enum
 from euclid3 import Point2, Line2
+
+
+class CnCommandType(Enum):
+    UNDEFINED = 0
+    FILL = 1
 
 
 class Command:
@@ -256,10 +262,53 @@ class Command:
             return self._gcode
 
 
-class CNCommand:
+class CnCommand:
+    def __init__(self, text, previous=None):
+        self._text: str = text
+        self._lines: list = text.split('\n')
+        self._previous: CnCommand = previous
 
-    def __init__(self):
         self._index: int = 0
+        self._type: CnCommandType = CnCommandType.UNDEFINED
+        self._label: str = ''
+        self._mcode: str = ''
+        self._gcodes: list = list()
+        self._spill: float = 0   # first P0 parameter
+        self._delay: float = 0   # second P0 parameter
+
+    def __str__(self):
+        return f'CnCommand(type={self._type})'
+
+    @staticmethod
+    def from_lines(text, previous):
+        lines = text.split('\n')
+        if len(lines) == 2:
+            return FillCnCommand(text=text, previous=previous)
+        else:
+            return CnCommand(text=text, previous=previous)
+
+
+class FillCnCommand(CnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Fill'
+        self._type = CnCommandType.FILL
+        self._mcode = 'M501'
+        self._gcodes = ['G04']
+
+        self._parse()
+
+    def __str__(self):
+        return f'FillCnCommand(spill={self._spill}, delay={self._delay})'
+
+    def _parse(self):
+        assert len(self._lines) == 2
+
+        line1, _ = self._lines
+        params = line1.split(' ')
+        self._index = int(params[0][1:4])
+        self._spill = float(params[2][1:])
+        self._delay = float(params[3][1:]) * 1000
 
 
 class CNFile:
