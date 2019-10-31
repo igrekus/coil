@@ -335,15 +335,21 @@ class CNFile:
             if r'//' in line or r'%' in line or ':' in line or 'G71' in line or 'G90' in line:
                 self._header.append(line)
 
-            elif not line or 'M30' in line:
-                self._footer.append(line)
-
             elif line.startswith('N'):
                 if not command_block:
                     command_block = line
                     continue
                 else:
                     self._commands.append(Command(command_block, previous=None if not self._commands else self._commands[-1]))
+                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
                     command_block = line
+
+            elif not line or 'M30' in line:
+                self._footer.append(line)
+                if command_block:
+                    self._commands.append(Command(command_block, previous=None if not self._commands else self._commands[-1]))
+                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
+                command_block = ''
+
             else:
                 command_block += '\n' + line
