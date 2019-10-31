@@ -112,9 +112,6 @@ class GcodeModel(QAbstractTableModel):
             row = index.row()
             col = index.column()
 
-            if row == 0 or row == 1 or row == len(self._data) - 1:
-                return QVariant(QBrush(QColor(COLOR_DISABLED)))
-
             command = self._data[row]['gcode']
             if command == 'G01':
                 if col in (5, 8, 9):
@@ -136,9 +133,6 @@ class GcodeModel(QAbstractTableModel):
         col = index.column()
 
         if col == 0:
-            return f ^ Qt.ItemIsEnabled
-
-        if row == 0 or row == 1 or row == len(self._data) - 1:
             return f ^ Qt.ItemIsEnabled
 
         command = self._data[row]['gcode']
