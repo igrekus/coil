@@ -269,6 +269,7 @@ class CNFile:
 
         self._header = list()
         self._commands = list()
+        self._footer = list()
 
         self._load()
         self._parse()
@@ -282,21 +283,18 @@ class CNFile:
         command_block = ''
         for line in self._raw_lines:
             line = line.strip()
-            if r'//' in line or r'%' in line or ':' in line or not line:
+            if r'//' in line or r'%' in line or ':' in line or 'G71' in line or 'G90' in line:
                 self._header.append(line)
+
+            elif not line or 'M30' in line:
+                self._footer.append(line)
 
             elif line.startswith('N'):
                 if not command_block:
                     command_block = line
                     continue
                 else:
-                    self._commands.append(Command(command_block, previous=self._commands[-1]))
+                    self._commands.append(Command(command_block, previous=None if not self._commands else self._commands[-1]))
                     command_block = line
-            elif 'G71' in line or 'G90' in line or 'M30' in line:
-                if command_block:
-                    self._commands.append(Command(command_block, previous=self._commands[-1]))
-                    command_block = ''
-                self._commands.append(Command(line))
-                continue
             else:
                 command_block += '\n' + line
