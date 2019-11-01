@@ -318,8 +318,6 @@ class FillCnCommand(CnCommand):
         self._spill = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value * 1000
 
-        print(self)
-
 
 class CNFile:
     def __init__(self, filename=None):
