@@ -7,8 +7,22 @@ from pygcode import Line
 
 
 class CnCommandType(Enum):
-    UNDEFINED = 0
-    FILL = 1
+    UNDEFINED, \
+        FILL, \
+        WELD, \
+        SONO_UP, \
+        SONO_MID, \
+        SONO_LOW, \
+        CUT_WIRE, \
+        EMBED_ON, \
+        EMBED_OFF, \
+        PULL_WIRE, \
+        HOLD_MODULE, \
+        RELEASE_MODULE, \
+        BRAKE_ON, \
+        BRAKE_OFF, \
+        THERM_MID, \
+        THERM_UP = range(16)
 
 
 class Command:
@@ -289,7 +303,18 @@ class CnCommand:
     @staticmethod
     def from_lines(text, previous):
         lines = text.split('\n')
-        if len(lines) == 2:
+        length = len(lines)
+        if length == 1:
+            line = lines[0]
+            if 'M70' in line:
+                return WeldCnCommand(text=text, previous=previous)
+            elif 'M71' in line:
+                return SonoUpCnCommand(text=text, previous=previous)
+            elif 'M72' in line:
+                return SonoMidCnCommand(text=text, previous=previous)
+            elif 'M73' in line:
+                return SonoLowCnCommand(text=text, previous=previous)
+        elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
             return CnCommand(text=text, previous=previous)
@@ -317,6 +342,69 @@ class FillCnCommand(CnCommand):
         self._index = line1.gcodes[0].number
         self._spill = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value * 1000
+
+
+class OneLineCnCommand(CnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'undefined one-line command'
+        self._type = CnCommandType.UNDEFINED
+
+        self._parse()
+
+    def __str__(self):
+        return f'OneLineCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+
+    def _parse(self):
+        super()._parse()
+        assert len(self._cnc_lines) == 1
+
+        line1 = self._cnc_lines[0]
+        assert line1.gcodes[0].word_letter == 'N'
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._delay = line1.block.modal_params[2].value
+
+
+class WeldCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Weld'
+        self._type = CnCommandType.WELD
+
+    def __str__(self):
+        return f'WeldCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+
+
+class SonoUpCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Sono Up'
+        self._type = CnCommandType.SONO_UP
+
+    def __str__(self):
+        return f'SonoUpCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+
+
+class SonoMidCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Sono Mid'
+        self._type = CnCommandType.SONO_MID
+
+    def __str__(self):
+        return f'SonoMidCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+
+
+class SonoLowCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Sono Low'
+        self._type = CnCommandType.SONO_MID
+
+    def __str__(self):
+        return f'SonoLowCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
 
 
 class CNFile:
