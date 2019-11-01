@@ -3,6 +3,7 @@ import math
 
 from enum import Enum
 from euclid3 import Point2, Line2
+from pygcode import Line
 
 
 class CnCommandType(Enum):
@@ -299,22 +300,25 @@ class FillCnCommand(CnCommand):
         super().__init__(text, previous)
         self._label = 'Fill'
         self._type = CnCommandType.FILL
-        self._mcode = 'M501'
-        self._gcodes = ['G04']
 
         self._parse()
 
     def __str__(self):
-        return f'FillCnCommand(spill={self._spill}, delay={self._delay})'
+        return f'FillCnCommand(n={self._index}, p1={self._spill}, p2={self._delay})'
 
     def _parse(self):
-        assert len(self._lines) == 2
+        super()._parse()
+        assert len(self._cnc_lines) == 2
 
-        line1, _ = self._lines
-        params = line1.split(' ')
-        self._index = int(params[0][1:4])
-        self._spill = float(params[2][1:])
-        self._delay = float(params[3][1:]) * 1000
+        line1, line2 = self._cnc_lines
+        assert line1.gcodes[0].word_letter == 'N'
+        assert line2.gcodes[0].word == 'G04'
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._delay = line1.block.modal_params[2].value * 1000
+
+        print(self)
 
 
 class CNFile:
