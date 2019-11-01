@@ -32,7 +32,7 @@ class GcodeModel(QAbstractTableModel):
 
         self._cnFile = CNFile(filename=self.currentFile)
 
-        self._headers = ['#', 'Command', 'X mm', 'Y mm', 'R mm', 'Arc', 'Speed', 'Spill', 'Delay', 'Pm']
+        self._headers = ['#', 'Command', 'X mm', 'Y mm', 'R mm', 'Arc', 'Speed', 'Spill', 'Delay', 'Prm']
         self._data = list()
 
         self._init()
