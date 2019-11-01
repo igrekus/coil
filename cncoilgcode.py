@@ -304,7 +304,7 @@ class FillCnCommand(CnCommand):
         self._parse()
 
     def __str__(self):
-        return f'FillCnCommand(n={self._index}, p1={self._spill}, p2={self._delay})'
+        return f'FillCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
 
     def _parse(self):
         super()._parse()
