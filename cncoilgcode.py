@@ -266,18 +266,24 @@ class CnCommand:
     def __init__(self, text, previous=None):
         self._text: str = text
         self._lines: list = text.split('\n')
-        self._previous: CnCommand = previous
 
-        self._index: int = 0
         self._type: CnCommandType = CnCommandType.UNDEFINED
-        self._label: str = ''
-        self._mcode: str = ''
-        self._gcodes: list = list()
-        self._spill: float = 0   # first P0 parameter
-        self._delay: float = 0   # second P0 parameter
+        self._previous: CnCommand = previous
+        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_start_point
+
+        self._cnc_lines: list = list()
+
+        self._geom_end_point: Point2 = None
+        self._index: int = 0
+        self._label: str = 'undefined'
+        self._spill: float = 0.0   # first P parameter
+        self._delay: float = 0.0   # second P parameter
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
+
+    def _parse(self):
+        self._cnc_lines = [Line(l) for l in self._lines]
 
     @staticmethod
     def from_lines(text, previous):
