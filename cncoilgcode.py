@@ -352,14 +352,14 @@ class CNFile:
                     continue
                 else:
                     self._commands.append(Command(command_block, previous=None if not self._commands else self._commands[-1]))
-                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
+                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._cncommands else self._cncommands[-1]))
                     command_block = line
 
             elif not line or 'M30' in line:
                 self._footer.append(line)
                 if command_block:
                     self._commands.append(Command(command_block, previous=None if not self._commands else self._commands[-1]))
-                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
+                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._cncommands else self._cncommands[-1]))
                 command_block = ''
 
             else:
