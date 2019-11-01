@@ -3,7 +3,7 @@ from PyQt5.QtGui import QBrush, QColor
 
 from cncoilgcode import CNFile
 
-COLOR_DISABLED = '#F5F5F5'
+COLOR_DISABLED = '#DDDDDD'
 GCODE_COMMAND_LABELS = {
     'M70': 'Weld',
     'M71': 'Sono up',
@@ -104,33 +104,14 @@ class GcodeModel(QAbstractTableModel):
         row = index.row()
 
         if not self.flags(index) & Qt.ItemIsEnabled and col != 0:
+            if role == Qt.BackgroundRole:
+                return QVariant(QBrush(QColor(COLOR_DISABLED)))
             return QVariant()
 
         if role == Qt.DisplayRole:
             if not self._data:
                 return QVariant()
             return QVariant(str(self._data[row][col]))
-
-        if role == Qt.BackgroundRole:
-            row = index.row()
-            col = index.column()
-
-            command = self._data[row]['gcode']
-            if command == 'G01':
-                if col in (5, 8, 9):
-                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
-
-            if command == 'G02' or command == 'G03':
-                if col in (8, 9):
-                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
-
-            elif command == 'M501':
-                if col in (2, 3, 4, 5, 6, 9):
-                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
-
-            if command in GCODE_COMMAND_LABELS:
-                if col in range(2, 9):
-                    return QVariant(QBrush(QColor(COLOR_DISABLED)))
 
         return QVariant()
 
