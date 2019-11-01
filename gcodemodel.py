@@ -26,10 +26,8 @@ class GcodeModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vtest.cnc"
-        # self.currentFile = 'C:\\devtools\\CNCoil\\CNCFILES\\vtest1.cnc'
-        self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vgeotest.cnc"
-        # self.currentFile = "C:\\devtools\\CNCoil\\CNCFILES\\vexp10n_.cnc"
+        self.currentFile = ".\\gcode\\vcomtest.cnc"
+
         self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
 
         self._cnFile = CNFile(filename=self.currentFile)
