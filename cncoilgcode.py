@@ -353,7 +353,7 @@ class OneLineCnCommand(CnCommand):
         self._parse()
 
     def __str__(self):
-        return f'OneLineCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+        return f'{self.__class__.__name__}(n={self._index} p1={self._spill} p2={self._delay})'
 
     def _parse(self):
         super()._parse()
@@ -373,18 +373,12 @@ class WeldCnCommand(OneLineCnCommand):
         self._label = 'Weld'
         self._type = CnCommandType.WELD
 
-    def __str__(self):
-        return f'WeldCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
-
 
 class SonoUpCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Up'
         self._type = CnCommandType.SONO_UP
-
-    def __str__(self):
-        return f'SonoUpCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
 
 
 class SonoMidCnCommand(OneLineCnCommand):
@@ -393,9 +387,6 @@ class SonoMidCnCommand(OneLineCnCommand):
         self._label = 'Sono Mid'
         self._type = CnCommandType.SONO_MID
 
-    def __str__(self):
-        return f'SonoMidCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
-
 
 class SonoLowCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
@@ -403,8 +394,8 @@ class SonoLowCnCommand(OneLineCnCommand):
         self._label = 'Sono Low'
         self._type = CnCommandType.SONO_MID
 
-    def __str__(self):
-        return f'SonoLowCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+class EmbedOffCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
 
 
 class CNFile:
