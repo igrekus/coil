@@ -293,6 +293,7 @@ class CnCommand:
         self._label: str = 'undefined'
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
+        self._prm: float = 0.0   # arbitrary parameter
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
@@ -363,7 +364,7 @@ class OneLineCnCommand(CnCommand):
         assert line1.gcodes[0].word_letter == 'N'
 
         self._index = line1.gcodes[0].number
-        self._spill = line1.block.modal_params[1].value
+        self._spill = self._prm = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value
 
 
