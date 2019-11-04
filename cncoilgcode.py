@@ -323,6 +323,10 @@ class CnCommand:
                 return EmbedOffCnCommand(text=text, previous=previous)
             elif 'M77' in line:
                 return EmbedOffCnCommand(text=text, previous=previous)
+            elif 'M78' in line:
+                return HoldModuleCnCommand(text=text, previous=previous)
+            elif 'M79' in line:
+                return ReleaseModuleCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -430,6 +434,20 @@ class PullWireCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Pull wire'
         self._type = CnCommandType.PULL_WIRE
+
+
+class HoldModuleCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Hold module'
+        self._type = CnCommandType.HOLD_MODULE
+
+
+class ReleaseModuleCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Release module'
+        self._type = CnCommandType.RELEASE_MODULE
 
 
 class CNFile:
