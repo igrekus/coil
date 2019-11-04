@@ -362,7 +362,7 @@ class OneLineCnCommand(CnCommand):
         self._parse()
 
     def __str__(self):
-        return f'{self.__class__.__name__}(n={self._index} p1={self._spill} p2={self._delay})'
+        return f'{self.__class__.__name__}(n={self._index} prm={self._prm})'
 
     def _parse(self):
         super()._parse()
