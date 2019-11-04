@@ -331,6 +331,10 @@ class CnCommand:
                 return BrakeOnCnCommand(text=text, previous=previous)
             elif 'M81' in line:
                 return BrakeOffCnCommand(text=text, previous=previous)
+            elif 'M82' in line:
+                return ThermMidCnCommand(text=text, previous=previous)
+            elif 'M83' in line:
+                return ThermUpCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -466,6 +470,20 @@ class BrakeOffCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Brake off'
         self._type = CnCommandType.BRAKE_OFF
+
+
+class ThermMidCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Therm mid'
+        self._type = CnCommandType.THERM_MID
+
+
+class ThermUpCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Therm up'
+        self._type = CnCommandType.THERM_UP
 
 
 class CNFile:
