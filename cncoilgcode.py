@@ -327,6 +327,10 @@ class CnCommand:
                 return HoldModuleCnCommand(text=text, previous=previous)
             elif 'M79' in line:
                 return ReleaseModuleCnCommand(text=text, previous=previous)
+            elif 'M80' in line:
+                return BrakeOnCnCommand(text=text, previous=previous)
+            elif 'M81' in line:
+                return BrakeOffCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -448,6 +452,20 @@ class ReleaseModuleCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Release module'
         self._type = CnCommandType.RELEASE_MODULE
+
+
+class BrakeOnCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Brake on'
+        self._type = CnCommandType.BRAKE_ON
+
+
+class BrakeOffCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Brake off'
+        self._type = CnCommandType.BRAKE_OFF
 
 
 class CNFile:
