@@ -315,6 +315,12 @@ class CnCommand:
                 return SonoMidCnCommand(text=text, previous=previous)
             elif 'M73' in line:
                 return SonoLowCnCommand(text=text, previous=previous)
+            elif 'M74' in line:
+                return CutWireCnCommand(text=text, previous=previous)
+            elif 'M75' in line:
+                return EmbedOnCnCommand(text=text, previous=previous)
+            elif 'M76' in line:
+                return EmbedOffCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -393,10 +399,28 @@ class SonoLowCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Low'
-        self._type = CnCommandType.SONO_MID
+        self._type = CnCommandType.SONO_LOW
+
+
+class CutWireCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Cut wire'
+        self._type = CnCommandType.CUT_WIRE
+
+
+class EmbedOnCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Embed on'
+        self._type = CnCommandType.EMBED_ON
+
 
 class EmbedOffCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Embed off'
+        self._type = CnCommandType.EMBED_OFF
 
 
 class CNFile:
