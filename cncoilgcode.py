@@ -321,6 +321,8 @@ class CnCommand:
                 return EmbedOnCnCommand(text=text, previous=previous)
             elif 'M76' in line:
                 return EmbedOffCnCommand(text=text, previous=previous)
+            elif 'M77' in line:
+                return EmbedOffCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -421,6 +423,13 @@ class EmbedOffCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Embed off'
         self._type = CnCommandType.EMBED_OFF
+
+
+class PullWireCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Pull wire'
+        self._type = CnCommandType.PULL_WIRE
 
 
 class CNFile:
