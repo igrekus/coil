@@ -293,6 +293,7 @@ class CnCommand:
         self._label: str = 'undefined'
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
+        self._prm: float = 0.0   # arbitrary parameter
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
@@ -314,6 +315,26 @@ class CnCommand:
                 return SonoMidCnCommand(text=text, previous=previous)
             elif 'M73' in line:
                 return SonoLowCnCommand(text=text, previous=previous)
+            elif 'M74' in line:
+                return CutWireCnCommand(text=text, previous=previous)
+            elif 'M75' in line:
+                return EmbedOnCnCommand(text=text, previous=previous)
+            elif 'M76' in line:
+                return EmbedOffCnCommand(text=text, previous=previous)
+            elif 'M77' in line:
+                return EmbedOffCnCommand(text=text, previous=previous)
+            elif 'M78' in line:
+                return HoldModuleCnCommand(text=text, previous=previous)
+            elif 'M79' in line:
+                return ReleaseModuleCnCommand(text=text, previous=previous)
+            elif 'M80' in line:
+                return BrakeOnCnCommand(text=text, previous=previous)
+            elif 'M81' in line:
+                return BrakeOffCnCommand(text=text, previous=previous)
+            elif 'M82' in line:
+                return ThermMidCnCommand(text=text, previous=previous)
+            elif 'M83' in line:
+                return ThermUpCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
         else:
@@ -353,7 +374,7 @@ class OneLineCnCommand(CnCommand):
         self._parse()
 
     def __str__(self):
-        return f'OneLineCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+        return f'{self.__class__.__name__}(n={self._index} prm={self._prm})'
 
     def _parse(self):
         super()._parse()
@@ -363,7 +384,7 @@ class OneLineCnCommand(CnCommand):
         assert line1.gcodes[0].word_letter == 'N'
 
         self._index = line1.gcodes[0].number
-        self._spill = line1.block.modal_params[1].value
+        self._spill = self._prm = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value
 
 
@@ -373,18 +394,12 @@ class WeldCnCommand(OneLineCnCommand):
         self._label = 'Weld'
         self._type = CnCommandType.WELD
 
-    def __str__(self):
-        return f'WeldCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
-
 
 class SonoUpCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Up'
         self._type = CnCommandType.SONO_UP
-
-    def __str__(self):
-        return f'SonoUpCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
 
 
 class SonoMidCnCommand(OneLineCnCommand):
@@ -393,18 +408,82 @@ class SonoMidCnCommand(OneLineCnCommand):
         self._label = 'Sono Mid'
         self._type = CnCommandType.SONO_MID
 
-    def __str__(self):
-        return f'SonoMidCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
-
 
 class SonoLowCnCommand(OneLineCnCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Low'
-        self._type = CnCommandType.SONO_MID
+        self._type = CnCommandType.SONO_LOW
 
-    def __str__(self):
-        return f'SonoLowCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+
+class CutWireCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Cut wire'
+        self._type = CnCommandType.CUT_WIRE
+
+
+class EmbedOnCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Embed on'
+        self._type = CnCommandType.EMBED_ON
+
+
+class EmbedOffCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Embed off'
+        self._type = CnCommandType.EMBED_OFF
+
+
+class PullWireCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Pull wire'
+        self._type = CnCommandType.PULL_WIRE
+
+
+class HoldModuleCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Hold module'
+        self._type = CnCommandType.HOLD_MODULE
+
+
+class ReleaseModuleCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Release module'
+        self._type = CnCommandType.RELEASE_MODULE
+
+
+class BrakeOnCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Brake on'
+        self._type = CnCommandType.BRAKE_ON
+
+
+class BrakeOffCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Brake off'
+        self._type = CnCommandType.BRAKE_OFF
+
+
+class ThermMidCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Therm mid'
+        self._type = CnCommandType.THERM_MID
+
+
+class ThermUpCnCommand(OneLineCnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Therm up'
+        self._type = CnCommandType.THERM_UP
 
 
 class CNFile:
