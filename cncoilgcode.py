@@ -284,11 +284,11 @@ class CnCommand:
 
         self._type: CnCommandType = CnCommandType.UNDEFINED
         self._previous: CnCommand = previous
-        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_start_point
+        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point
 
         self._cnc_lines: list = list()
 
-        self._geom_end_point: Point2 = None
+        self._geom_end_point: Point2 = self._geom_start_point
         self._index: int = 0
         self._label: str = 'undefined'
         self._spill: float = 0.0   # first P parameter
