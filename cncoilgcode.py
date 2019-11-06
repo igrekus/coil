@@ -574,7 +574,7 @@ class ArcToCnCommand(CnCommand):
     @property
     def length(self):
         # TODO calc actual arc length
-        return 2 * math.pi * self._geom_primitives[0]
+        return 2 * math.pi * self._geom_primitives[0].r
 
     def _parse(self):
         super()._parse()
