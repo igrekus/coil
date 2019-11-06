@@ -364,6 +364,15 @@ class CnCommand:
                 return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
             elif 'G03' in line3:
                 return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
+        elif length == 4:
+            # long arc = arc + arc
+            line1, line2, line3, line4 = lines
+            if 'G01' not in line3 and 'G01' not in line4:
+                if 'G02' in line3 and 'G02' in line4:
+                    return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CW)
+                elif 'G03' in line3 and 'G03' in line4:
+                    return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CCW)
+
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -577,22 +586,51 @@ class ArcToCnCommand(CnCommand):
         return 2 * math.pi * self._geom_primitives[0].r
 
     def _parse(self):
+
+        def parse_short():
+            line3 = self._cnc_lines[-1]
+
+            params = line3.gcodes[0].params
+
+            self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+
+            center = Point2(params['I'].value, params['J'].value)
+
+            self._r = round(math.sqrt(pow(self._geom_end_point.x - center.x, 2) +
+                                      pow(self._geom_end_point.y - center.y, 2)), 1)
+
+            # TODO create actual arc
+            self._geom_primitives.append(Circle(center, self._r))
+
+        def parse_long():
+            *_, line3, line4 = self._cnc_lines
+
+            params1 = line3.gcodes[0].params
+            params2 = line4.gcodes[0].params
+
+            self._geom_end_point = Point2(params2['X'].value, params2['Y'].value)
+
+            arc1_end = Point2(params1['X'].value, params1['Y'].value)
+            center1 = Point2(params1['I'].value, params1['J'].value)
+            arc2_end = Point2(params2['X'].value, params2['Y'].value)
+            center2 = Point2(params2['I'].value, params2['J'].value)
+
+            self._r = round(math.sqrt(pow(self._geom_end_point.x - center1.x, 2) +
+                                      pow(self._geom_end_point.y - center1.y, 2)), 1)
+
+            # TODO calc actual arc
+            self._geom_primitives.append(Circle(center1, self._r))
+            self._geom_primitives.append(Circle(center2, self._r))
+
         super()._parse()
+        self._index = self._cnc_lines[0].gcodes[0].number
+        self._spill = self._cnc_lines[0].block.modal_params[1].value
+        self._speed = self._cnc_lines[1].gcodes[0].word.value
 
-        line1, line2, line3 = self._cnc_lines
-
-        self._index = line1.gcodes[0].number
-        self._spill = line1.block.modal_params[1].value
-        self._speed = line2.gcodes[0].word.value
-
-        params = line3.gcodes[0].params
-        self._geom_end_point = Point2(params['X'].value, params['Y'].value)
-
-        i, j = params['I'].value, params['J'].value
-        self._r = round(math.sqrt(pow(self._geom_end_point.x - i, 2) + pow(self._geom_end_point.y - j, 2)), 1)
-
-        # TODO create actual arc
-        self._geom_primitives.append(Circle(Point2(i, j), self._r))
+        if len(self._cnc_lines) == 3:
+            parse_short()
+        elif len(self._cnc_lines) == 4:
+            parse_long()
 
 
 class CNFile:
