@@ -2,7 +2,7 @@ import os
 import math
 
 from enum import Enum
-from euclid3 import Point2, Line2, LineSegment2
+from euclid3 import Point2, Line2, LineSegment2, Circle
 from pygcode import Line
 
 
@@ -23,7 +23,9 @@ class CnCommandType(Enum):
         BRAKE_OFF, \
         THERM_MID, \
         THERM_UP,\
-        LINE_TO = range(17)
+        LINE_TO,\
+        CW_ARC_TO, \
+        CCW_ARC_TO = range(19)
 
 
 class ArcType(Enum):
@@ -354,6 +356,8 @@ class CnCommand:
             line1, line2, line3 = lines
             if 'G01' in line3:
                 return LineToCnCommand(text=text, previous=previous)
+            elif 'G02' in line3:
+                return CwArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT)
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -537,6 +541,49 @@ class LineToCnCommand(CnCommand):
         params = line3.gcodes[0].params
         self._geom_end_point = Point2(params['X'].value, params['Y'].value)
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
+
+class CwArcToCnCommand(CnCommand):
+    def __init__(self, text, previous=None, arc_type=ArcType.SHORT):
+        super().__init__(text, previous)
+        self._label = 'CW Arc To'
+        self._type = CnCommandType.CW_ARC_TO
+        self._arc = arc_type
+
+        self._parse()
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(' \
+               f'n={self._index} ' \
+               f'x={self._geom_end_point.x} ' \
+               f'y={self._geom_end_point.y} ' \
+               f'r={self._r} ' \
+               f'sp={self._speed} ' \
+               f'p1={self._spill} ' \
+               f'l={self.length})'
+
+    @property
+    def length(self):
+        # TODO calc actual arc length
+        return 2 * math.pi * self._geom_primitives[0]
+
+    def _parse(self):
+        super()._parse()
+
+        line1, line2, line3 = self._cnc_lines
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+
+        i, j = params['I'].value, params['J'].value
+        self._r = round(math.sqrt(pow(self._geom_end_point.x - i, 2) + pow(self._geom_end_point.y - j, 2)), 1)
+
+        # TODO create actual arc
+        self._geom_primitives.append(Circle(Point2(i, j), self._r))
 
 
 class CNFile:
