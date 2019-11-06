@@ -2,7 +2,7 @@ import os
 import math
 
 from enum import Enum
-from euclid3 import Point2, Line2
+from euclid3 import Point2, Line2, LineSegment2, Circle
 from pygcode import Line
 
 
@@ -22,7 +22,21 @@ class CnCommandType(Enum):
         BRAKE_ON, \
         BRAKE_OFF, \
         THERM_MID, \
-        THERM_UP = range(16)
+        THERM_UP,\
+        LINE_TO,\
+        CW_ARC_TO, \
+        CCW_ARC_TO = range(19)
+
+
+class ArcType(Enum):
+    SHORT, LONG = range(2)
+
+
+class ArcDirection(Enum):
+    CW, CCW = range(2)
+
+
+arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
 class Command:
@@ -289,11 +303,16 @@ class CnCommand:
         self._cnc_lines: list = list()
 
         self._geom_end_point: Point2 = self._geom_start_point
+        self._geom_primitives = list()
+
         self._index: int = 0
         self._label: str = 'undefined'
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
         self._prm: float = 0.0   # arbitrary parameter
+        self._r: float = 0.0
+        self._speed: float = 0.0
+        self._arc_type: ArcType = ArcType.SHORT
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
@@ -337,6 +356,14 @@ class CnCommand:
                 return ThermUpCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
+        elif length == 3:
+            line1, line2, line3 = lines
+            if 'G01' in line3:
+                return LineToCnCommand(text=text, previous=previous)
+            elif 'G02' in line3:
+                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
+            elif 'G03' in line3:
+                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -484,6 +511,88 @@ class ThermUpCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Therm up'
         self._type = CnCommandType.THERM_UP
+
+
+class LineToCnCommand(CnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Line To'
+        self._type = CnCommandType.LINE_TO
+
+        self._parse()
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(' \
+               f'n={self._index} ' \
+               f'x={self._geom_end_point.x} ' \
+               f'y={self._geom_end_point.y} ' \
+               f'r={self._r} ' \
+               f'sp={self._speed} ' \
+               f'p1={self._spill} ' \
+               f'l={self.length})'
+
+    @property
+    def length(self):
+        return self._geom_primitives[0].length
+
+    def _parse(self):
+        super()._parse()
+
+        line1, line2, line3 = self._cnc_lines
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
+
+class ArcToCnCommand(CnCommand):
+    def __init__(self, text, previous=None, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW):
+        super().__init__(text, previous)
+        self._label = 'CW Arc To' if arc_dir else 'CCW Arc To'
+        self._type = CnCommandType.CW_ARC_TO
+        self._arc_type = arc_type
+        self._arc_dir = arc_dir
+
+        self._parse()
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(' \
+               f'n={self._index} ' \
+               f'x={self._geom_end_point.x} ' \
+               f'y={self._geom_end_point.y} ' \
+               f'r={self._r} ' \
+               f't={self._arc_type} ' \
+               f'd={self._arc_dir} ' \
+               f'sp={self._speed} ' \
+               f'p1={self._spill} ' \
+               f'l={self.length})'
+
+    @property
+    def length(self):
+        # TODO calc actual arc length
+        return 2 * math.pi * self._geom_primitives[0].r
+
+    def _parse(self):
+        super()._parse()
+
+        line1, line2, line3 = self._cnc_lines
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+
+        i, j = params['I'].value, params['J'].value
+        self._r = round(math.sqrt(pow(self._geom_end_point.x - i, 2) + pow(self._geom_end_point.y - j, 2)), 1)
+
+        # TODO create actual arc
+        self._geom_primitives.append(Circle(Point2(i, j), self._r))
 
 
 class CNFile:
