@@ -32,6 +32,10 @@ class ArcType(Enum):
     SHORT, LONG = range(2)
 
 
+class ArcDirection(Enum):
+    CW, CCW = range(2)
+
+
 arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
@@ -308,7 +312,7 @@ class CnCommand:
         self._prm: float = 0.0   # arbitrary parameter
         self._r: float = 0.0
         self._speed: float = 0.0
-        self._arc: ArcType = ArcType.SHORT
+        self._arc_type: ArcType = ArcType.SHORT
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
@@ -357,7 +361,9 @@ class CnCommand:
             if 'G01' in line3:
                 return LineToCnCommand(text=text, previous=previous)
             elif 'G02' in line3:
-                return CwArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT)
+                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
+            elif 'G03' in line3:
+                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -543,12 +549,13 @@ class LineToCnCommand(CnCommand):
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
 
 
-class CwArcToCnCommand(CnCommand):
-    def __init__(self, text, previous=None, arc_type=ArcType.SHORT):
+class ArcToCnCommand(CnCommand):
+    def __init__(self, text, previous=None, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW):
         super().__init__(text, previous)
-        self._label = 'CW Arc To'
+        self._label = 'CW Arc To' if arc_dir else 'CCW Arc To'
         self._type = CnCommandType.CW_ARC_TO
-        self._arc = arc_type
+        self._arc_type = arc_type
+        self._arc_dir = arc_dir
 
         self._parse()
 
@@ -558,6 +565,8 @@ class CwArcToCnCommand(CnCommand):
                f'x={self._geom_end_point.x} ' \
                f'y={self._geom_end_point.y} ' \
                f'r={self._r} ' \
+               f't={self._arc_type} ' \
+               f'd={self._arc_dir} ' \
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
                f'l={self.length})'
