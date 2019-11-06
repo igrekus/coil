@@ -2,7 +2,7 @@ import os
 import math
 
 from enum import Enum
-from euclid3 import Point2, Line2
+from euclid3 import Point2, Line2, LineSegment2
 from pygcode import Line
 
 
@@ -22,7 +22,8 @@ class CnCommandType(Enum):
         BRAKE_ON, \
         BRAKE_OFF, \
         THERM_MID, \
-        THERM_UP = range(16)
+        THERM_UP,\
+        LINE_TO = range(17)
 
 
 class ArcType(Enum):
@@ -349,6 +350,10 @@ class CnCommand:
                 return ThermUpCnCommand(text=text, previous=previous)
         elif length == 2:
             return FillCnCommand(text=text, previous=previous)
+        elif length == 3:
+            line1, line2, line3 = lines
+            if 'G01' in line3:
+                return LineToCnCommand(text=text, previous=previous)
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -496,6 +501,42 @@ class ThermUpCnCommand(OneLineCnCommand):
         super().__init__(text, previous)
         self._label = 'Therm up'
         self._type = CnCommandType.THERM_UP
+
+
+class LineToCnCommand(CnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Line To'
+        self._type = CnCommandType.LINE_TO
+
+        self._parse()
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(' \
+               f'n={self._index} ' \
+               f'x={self._geom_end_point.x} ' \
+               f'y={self._geom_end_point.y} ' \
+               f'r={self._geom_r} ' \
+               f'sp={self._speed} ' \
+               f'p1={self._spill} ' \
+               f'l={self.length})'
+
+    @property
+    def length(self):
+        return self._geom_primitives[0].length
+
+    def _parse(self):
+        super()._parse()
+
+        line1, line2, line3 = self._cnc_lines
+
+        self._index = line1.gcodes[0].number
+        self._spill = line1.block.modal_params[1].value
+        self._speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
 
 
 class CNFile:
