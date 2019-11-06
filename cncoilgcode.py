@@ -296,6 +296,7 @@ class CnCommand:
         self._cnc_lines: list = list()
 
         self._geom_end_point: Point2 = self._geom_start_point
+        self._geom_r: float = 0.0
         self._index: int = 0
         self._label: str = 'undefined'
         self._spill: float = 0.0   # first P parameter
