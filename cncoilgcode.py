@@ -516,7 +516,7 @@ class LineToCnCommand(CnCommand):
                f'n={self._index} ' \
                f'x={self._geom_end_point.x} ' \
                f'y={self._geom_end_point.y} ' \
-               f'r={self._geom_r} ' \
+               f'r={self._r} ' \
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
                f'l={self.length})'
