@@ -310,6 +310,8 @@ class CnCommand:
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
         self._prm: float = 0.0   # arbitrary parameter
+        self._x: float = 0.0
+        self._y: float = 0.0
         self._r: float = 0.0
         self._speed: float = 0.0
         self._arc_type: ArcType = ArcType.SHORT
@@ -533,8 +535,8 @@ class LineToCnCommand(CnCommand):
     def __str__(self):
         return f'{self.__class__.__name__}(' \
                f'n={self._index} ' \
-               f'x={self._geom_end_point.x} ' \
-               f'y={self._geom_end_point.y} ' \
+               f'x={self._x} ' \
+               f'y={self._y} ' \
                f'r={self._r} ' \
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
@@ -555,6 +557,10 @@ class LineToCnCommand(CnCommand):
 
         params = line3.gcodes[0].params
         self._geom_end_point = Point2(params['X'].value, params['Y'].value)
+
+        self._x = self._geom_end_point.x
+        self._y = self._geom_end_point.y
+
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
 
 
@@ -571,8 +577,8 @@ class ArcToCnCommand(CnCommand):
     def __str__(self):
         return f'{self.__class__.__name__}(' \
                f'n={self._index} ' \
-               f'x={self._geom_end_point.x} ' \
-               f'y={self._geom_end_point.y} ' \
+               f'x={self._x} ' \
+               f'y={self._y} ' \
                f'r={self._r} ' \
                f't={self._arc_type} ' \
                f'd={self._arc_dir} ' \
@@ -598,6 +604,8 @@ class ArcToCnCommand(CnCommand):
 
             self._r = round(math.sqrt(pow(self._geom_end_point.x - center.x, 2) +
                                       pow(self._geom_end_point.y - center.y, 2)), 1)
+            self._x = self._geom_end_point.x
+            self._y = self._geom_end_point.y
 
             # TODO create actual arc
             self._geom_primitives.append(Circle(center, self._r))
@@ -617,6 +625,8 @@ class ArcToCnCommand(CnCommand):
 
             self._r = round(math.sqrt(pow(self._geom_end_point.x - center1.x, 2) +
                                       pow(self._geom_end_point.y - center1.y, 2)), 1)
+            self._x = self._geom_end_point.x
+            self._y = self._geom_end_point.y
 
             # TODO calc actual arc
             self._geom_primitives.append(Circle(center1, self._r))
