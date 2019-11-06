@@ -25,6 +25,13 @@ class CnCommandType(Enum):
         THERM_UP = range(16)
 
 
+class ArcType(Enum):
+    SHORT, LONG = range(2)
+
+
+arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
+
+
 class Command:
     def __init__(self, text, previous=None):
         self._text: str = text.strip()
@@ -294,6 +301,7 @@ class CnCommand:
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
         self._prm: float = 0.0   # arbitrary parameter
+        self._arc: ArcType = ArcType.SHORT
 
     def __str__(self):
         return f'CnCommand(type={self._type})'
