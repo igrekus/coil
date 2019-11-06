@@ -301,6 +301,7 @@ class CnCommand:
         self._spill: float = 0.0   # first P parameter
         self._delay: float = 0.0   # second P parameter
         self._prm: float = 0.0   # arbitrary parameter
+        self._speed: float = 0.0
         self._arc: ArcType = ArcType.SHORT
 
     def __str__(self):
