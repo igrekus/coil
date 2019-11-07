@@ -862,3 +862,7 @@ class CNFile:
 
             else:
                 command_block += '\n' + line
+
+    @property
+    def length(self):
+        return sum((el.length for el in self._cncommands))
