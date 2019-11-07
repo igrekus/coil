@@ -96,6 +96,10 @@ class CnCommand:
         self._cnc_lines = [Line(l) for l in self._lines]
 
     @property
+    def enabled(self):
+        return ()
+
+    @property
     def length(self):
         return 0
 
@@ -120,7 +124,7 @@ class CnCommand:
             elif 'M76' in line:
                 return EmbedOffCnCommand(text=text, previous=previous)
             elif 'M77' in line:
-                return EmbedOffCnCommand(text=text, previous=previous)
+                return PullWireCnCommand(text=text, previous=previous)
             elif 'M78' in line:
                 return HoldModuleCnCommand(text=text, previous=previous)
             elif 'M79' in line:
@@ -174,6 +178,20 @@ class FillCnCommand(CnCommand):
     def __str__(self):
         return f'FillCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
 
+    def __getitem__(self, item):
+        if item in range(2, 7):
+            return ''
+        elif item == 0:
+            return self._index
+        elif item == 1:
+            return self._label
+        elif item == 7:
+            return self._spill
+        elif item == 8:
+            return self._delay
+        elif item == 9:
+            return ''
+
     def _parse(self):
         super()._parse()
         assert len(self._cnc_lines) == 2
@@ -185,6 +203,10 @@ class FillCnCommand(CnCommand):
         self._index = line1.gcodes[0].number
         self._spill = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value * 1000
+
+    @property
+    def enabled(self):
+        return 1, 7, 8
 
 
 class OneLineCnCommand(CnCommand):
@@ -198,6 +220,16 @@ class OneLineCnCommand(CnCommand):
     def __str__(self):
         return f'{self.__class__.__name__}(n={self._index} prm={self._prm})'
 
+    def __getitem__(self, item):
+        if item in range(2, 9):
+            return ''
+        elif item == 0:
+            return self._index
+        elif item == 1:
+            return self._label
+        elif item == 9:
+            return self._prm
+
     def _parse(self):
         super()._parse()
         assert len(self._cnc_lines) == 1
@@ -208,6 +240,10 @@ class OneLineCnCommand(CnCommand):
         self._index = line1.gcodes[0].number
         self._spill = self._prm = line1.block.modal_params[1].value
         self._delay = line1.block.modal_params[2].value
+
+    @property
+    def enabled(self):
+        return 1, 9
 
 
 class WeldCnCommand(OneLineCnCommand):
@@ -326,9 +362,19 @@ class LineToCnCommand(CnCommand):
                f'p1={self._spill} ' \
                f'l={self.length})'
 
+    def __getitem__(self, item):
+        ret = super().__getitem__(item)
+        if item == 4:
+            ret = '*'
+        return ret
+
     @property
     def length(self):
         return self._geom_primitives[0].length
+
+    @property
+    def enabled(self):
+        return 1, 2, 3, 4, 6, 7
 
     def _parse(self):
         super()._parse()
@@ -369,6 +415,10 @@ class ArcToCnCommand(CnCommand):
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
                f'l={self.length})'
+
+    @property
+    def enabled(self):
+        return range(1, 8)
 
     @property
     def length(self):
@@ -446,6 +496,10 @@ class LineToWithEndCurveCnCommand(CnCommand):
                f'l={self.length})'
 
     @property
+    def enabled(self):
+        return 1, 2, 3, 4, 6, 7
+
+    @property
     def length(self):
         line, arc = self._geom_primitives
         return line.length + 2 * math.pi * arc.r
@@ -498,6 +552,16 @@ class LineToWithStartCurveCnCommand(CnCommand):
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
                f'l={self.length})'
+
+    def __getitem__(self, item):
+        ret = super().__getitem__(item)
+        if item == 4:
+            ret = '*'
+        return ret
+
+    @property
+    def enabled(self):
+        return 1, 2, 3, 4, 6, 7
 
     @property
     def length(self):
@@ -552,6 +616,10 @@ class LineToWithBothCurvesCnCommand(CnCommand):
                f'sp={self._speed} ' \
                f'p1={self._spill} ' \
                f'l={self.length})'
+
+    @property
+    def enabled(self):
+        return 1, 2, 3, 4, 6, 7
 
     @property
     def length(self):
