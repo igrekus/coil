@@ -27,7 +27,8 @@ class CnCommandType(Enum):
         CW_ARC_TO, \
         CCW_ARC_TO, \
         LINE_TO_END, \
-        LINE_TO_START = range(21)
+        LINE_TO_START, \
+        LINE_TO_BOTH = range(22)
 
 
 class ArcType(Enum):
@@ -382,7 +383,8 @@ class CnCommand:
             # start arc + line
             elif 'G01' not in line3 and 'G01' in line4:
                 return LineToWithStartCurveCnCommand(text=text, previous=previous)
-
+        elif length == 5:
+            return LineToWithBothCurvesCnCommand(text=text, previous=previous)
         else:
             return CnCommand(text=text, previous=previous)
 
@@ -757,6 +759,64 @@ class LineToWithStartCurveCnCommand(CnCommand):
         # TODO calc actual arc
         self._geom_primitives.append(Circle(arc_center, self._r))
         self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
+
+
+class LineToWithBothCurvesCnCommand(CnCommand):
+    def __init__(self, text, previous=None):
+        super().__init__(text, previous)
+        self._label = 'Line To (b)'
+        self._type = CnCommandType.LINE_TO_BOTH
+
+        self._parse()
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(' \
+               f'n={self._index} ' \
+               f'x={self._x} ' \
+               f'y={self._y} ' \
+               f'r={self._r} ' \
+               f'sp={self._speed} ' \
+               f'p1={self._spill} ' \
+               f'l={self.length})'
+
+    @property
+    def length(self):
+        arc1, line, arc2 = self._geom_primitives
+        return 2 * math.pi * arc1.r + line.length + 2 * math.pi + arc2.r
+
+    def _parse(self):
+        super()._parse()
+        self._index = self._cnc_lines[0].gcodes[0].number
+        self._spill = self._cnc_lines[0].block.modal_params[1].value
+        self._speed = self._cnc_lines[1].gcodes[0].word.value
+
+        *_, line3, line4, line5 = self._cnc_lines
+
+        params_arc1 = line3.gcodes[0].params
+        params_line = line4.gcodes[0].params
+        params_arc2 = line5.gcodes[0].params
+
+        arc1_end = Point2(params_arc1['X'].value, params_arc1['Y'].value)
+        arc1_center = Point2(params_arc1['I'].value, params_arc1['J'].value)
+        arc1_rad = round(math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2)), 1)
+
+        line_end = Point2(params_line['X'].value, params_line['Y'].value)
+
+        arc2_end = Point2(params_arc2['X'].value, params_arc2['Y'].value)
+        arc2_center = Point2(params_arc2['I'].value, params_arc2['J'].value)
+        arc2_rad = round(math.sqrt(pow(arc2_end.x - arc2_center.x, 2) + pow(arc2_end.y - arc2_center.y, 2)), 1)
+
+        l1 = Line2(arc2_center, arc2_end)
+        l2 = Line2(arc1_end, line_end)
+        end_point = l1.intersect(l2)
+
+        self._x = round(end_point.x, 1)
+        self._y = round(end_point.y, 1)
+        self._r = round(arc2_rad, 1)
+
+        self._geom_primitives.append(Circle(arc1_center, arc1_rad))
+        self._geom_primitives.append(LineSegment2(arc1_end, line_end))
+        self._geom_primitives.append(Circle(arc2_center, arc2_rad))
 
 
 class CNFile:
