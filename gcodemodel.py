@@ -142,7 +142,4 @@ class GcodeModel(QAbstractTableModel):
 
     @property
     def length(self):
-        lng = 0
-        for c in self._commands:
-            lng += len(c)
-        return lng
+        return self._cnFile.length

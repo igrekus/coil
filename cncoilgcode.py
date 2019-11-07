@@ -325,6 +325,10 @@ class CnCommand:
     def _parse(self):
         self._cnc_lines = [Line(l) for l in self._lines]
 
+    @property
+    def length(self):
+        return 0
+
     @staticmethod
     def from_lines(text, previous):
         lines = text.split('\n')
