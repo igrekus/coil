@@ -118,25 +118,8 @@ class GcodeModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
 
-        if col == 0:
+        if col not in self._data[row].enabled:
             return f ^ Qt.ItemIsEnabled
-
-        command = self._data[row]['gcode']
-        if command == 'G01':
-            if col in (5, 8, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command == 'G02' or command == 'G03':
-            if col in (8, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command == 'M501':
-            if col in (2, 3, 4, 5, 6, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command in GCODE_COMMAND_LABELS:
-            if col in range(2, 9):
-                return f ^ Qt.ItemIsEnabled
 
         return f
 
