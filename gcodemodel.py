@@ -26,7 +26,7 @@ class GcodeModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.currentFile = ".\\gcode\\vcomtest.cnc"
+        self.currentFile = ".\\gcode\\vgeotest.cnc"
 
         self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
 
