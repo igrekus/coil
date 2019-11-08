@@ -6,7 +6,7 @@ from euclid3 import Point2, Line2, LineSegment2, Circle
 from pygcode import Line
 
 
-class CnCommandType(Enum):
+class CommandType(Enum):
     UNDEFINED, \
         FILL, \
         WELD, \
@@ -42,13 +42,13 @@ class ArcDirection(Enum):
 arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
-class CnCommand:
+class Command:
     def __init__(self, text, previous=None):
         self._text: str = text
         self._lines: list = text.split('\n')
 
-        self._type: CnCommandType = CnCommandType.UNDEFINED
-        self._previous: CnCommand = previous
+        self._type: CommandType = CommandType.UNDEFINED
+        self._previous: Command = previous
         self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point
 
         self._cnc_lines: list = list()
@@ -110,68 +110,68 @@ class CnCommand:
         if length == 1:
             line = lines[0]
             if 'M70' in line:
-                return WeldCnCommand(text=text, previous=previous)
+                return WeldCommand(text=text, previous=previous)
             elif 'M71' in line:
-                return SonoUpCnCommand(text=text, previous=previous)
+                return SonoUpCommand(text=text, previous=previous)
             elif 'M72' in line:
-                return SonoMidCnCommand(text=text, previous=previous)
+                return SonoMidCommand(text=text, previous=previous)
             elif 'M73' in line:
-                return SonoLowCnCommand(text=text, previous=previous)
+                return SonoLowCommand(text=text, previous=previous)
             elif 'M74' in line:
-                return CutWireCnCommand(text=text, previous=previous)
+                return CutWireCommand(text=text, previous=previous)
             elif 'M75' in line:
-                return EmbedOnCnCommand(text=text, previous=previous)
+                return EmbedOnCommand(text=text, previous=previous)
             elif 'M76' in line:
-                return EmbedOffCnCommand(text=text, previous=previous)
+                return EmbedOffCommand(text=text, previous=previous)
             elif 'M77' in line:
-                return PullWireCnCommand(text=text, previous=previous)
+                return PullWireCommand(text=text, previous=previous)
             elif 'M78' in line:
-                return HoldModuleCnCommand(text=text, previous=previous)
+                return HoldModuleCommand(text=text, previous=previous)
             elif 'M79' in line:
-                return ReleaseModuleCnCommand(text=text, previous=previous)
+                return ReleaseModuleCommand(text=text, previous=previous)
             elif 'M80' in line:
-                return BrakeOnCnCommand(text=text, previous=previous)
+                return BrakeOnCommand(text=text, previous=previous)
             elif 'M81' in line:
-                return BrakeOffCnCommand(text=text, previous=previous)
+                return BrakeOffCommand(text=text, previous=previous)
             elif 'M82' in line:
-                return ThermMidCnCommand(text=text, previous=previous)
+                return ThermMidCommand(text=text, previous=previous)
             elif 'M83' in line:
-                return ThermUpCnCommand(text=text, previous=previous)
+                return ThermUpCommand(text=text, previous=previous)
         elif length == 2:
-            return FillCnCommand(text=text, previous=previous)
+            return FillCommand(text=text, previous=previous)
         elif length == 3:
             line1, line2, line3 = lines
             if 'G01' in line3:
-                return LineToCnCommand(text=text, previous=previous)
+                return LineToCommand(text=text, previous=previous)
             elif 'G02' in line3:
-                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
+                return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
             elif 'G03' in line3:
-                return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
+                return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
         elif length == 4:
             # long arc = arc + arc
             *_, line3, line4 = lines
             if 'G01' not in line3 and 'G01' not in line4:
                 if 'G02' in line3 and 'G02' in line4:
-                    return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CW)
+                    return ArcToCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CW)
                 elif 'G03' in line3 and 'G03' in line4:
-                    return ArcToCnCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CCW)
+                    return ArcToCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CCW)
             # line + end arc
             elif 'G01' in line3 and 'G01' not in line4:
-                return LineToWithEndCurveCnCommand(text=text, previous=previous)
+                return LineToWithEndCurveCommand(text=text, previous=previous)
             # start arc + line
             elif 'G01' not in line3 and 'G01' in line4:
-                return LineToWithStartCurveCnCommand(text=text, previous=previous)
+                return LineToWithStartCurveCommand(text=text, previous=previous)
         elif length == 5:
-            return LineToWithBothCurvesCnCommand(text=text, previous=previous)
+            return LineToWithBothCurvesCommand(text=text, previous=previous)
         else:
-            return CnCommand(text=text, previous=previous)
+            return Command(text=text, previous=previous)
 
 
-class FillCnCommand(CnCommand):
+class FillCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Fill'
-        self._type = CnCommandType.FILL
+        self._type = CommandType.FILL
 
         self._parse()
 
@@ -209,11 +209,11 @@ class FillCnCommand(CnCommand):
         return 1, 7, 8
 
 
-class OneLineCnCommand(CnCommand):
+class OneLineCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'undefined one-line command'
-        self._type = CnCommandType.UNDEFINED
+        self._type = CommandType.UNDEFINED
 
         self._parse()
 
@@ -246,109 +246,109 @@ class OneLineCnCommand(CnCommand):
         return 1, 9
 
 
-class WeldCnCommand(OneLineCnCommand):
+class WeldCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Weld'
-        self._type = CnCommandType.WELD
+        self._type = CommandType.WELD
 
 
-class SonoUpCnCommand(OneLineCnCommand):
+class SonoUpCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Up'
-        self._type = CnCommandType.SONO_UP
+        self._type = CommandType.SONO_UP
 
 
-class SonoMidCnCommand(OneLineCnCommand):
+class SonoMidCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Mid'
-        self._type = CnCommandType.SONO_MID
+        self._type = CommandType.SONO_MID
 
 
-class SonoLowCnCommand(OneLineCnCommand):
+class SonoLowCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Sono Low'
-        self._type = CnCommandType.SONO_LOW
+        self._type = CommandType.SONO_LOW
 
 
-class CutWireCnCommand(OneLineCnCommand):
+class CutWireCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Cut wire'
-        self._type = CnCommandType.CUT_WIRE
+        self._type = CommandType.CUT_WIRE
 
 
-class EmbedOnCnCommand(OneLineCnCommand):
+class EmbedOnCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Embed on'
-        self._type = CnCommandType.EMBED_ON
+        self._type = CommandType.EMBED_ON
 
 
-class EmbedOffCnCommand(OneLineCnCommand):
+class EmbedOffCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Embed off'
-        self._type = CnCommandType.EMBED_OFF
+        self._type = CommandType.EMBED_OFF
 
 
-class PullWireCnCommand(OneLineCnCommand):
+class PullWireCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Pull wire'
-        self._type = CnCommandType.PULL_WIRE
+        self._type = CommandType.PULL_WIRE
 
 
-class HoldModuleCnCommand(OneLineCnCommand):
+class HoldModuleCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Hold module'
-        self._type = CnCommandType.HOLD_MODULE
+        self._type = CommandType.HOLD_MODULE
 
 
-class ReleaseModuleCnCommand(OneLineCnCommand):
+class ReleaseModuleCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Release module'
-        self._type = CnCommandType.RELEASE_MODULE
+        self._type = CommandType.RELEASE_MODULE
 
 
-class BrakeOnCnCommand(OneLineCnCommand):
+class BrakeOnCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Brake on'
-        self._type = CnCommandType.BRAKE_ON
+        self._type = CommandType.BRAKE_ON
 
 
-class BrakeOffCnCommand(OneLineCnCommand):
+class BrakeOffCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Brake off'
-        self._type = CnCommandType.BRAKE_OFF
+        self._type = CommandType.BRAKE_OFF
 
 
-class ThermMidCnCommand(OneLineCnCommand):
+class ThermMidCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Therm mid'
-        self._type = CnCommandType.THERM_MID
+        self._type = CommandType.THERM_MID
 
 
-class ThermUpCnCommand(OneLineCnCommand):
+class ThermUpCommand(OneLineCommand):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Therm up'
-        self._type = CnCommandType.THERM_UP
+        self._type = CommandType.THERM_UP
 
 
-class LineToCnCommand(CnCommand):
+class LineToCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Line To'
-        self._type = CnCommandType.LINE_TO
+        self._type = CommandType.LINE_TO
 
         self._parse()
 
@@ -394,11 +394,11 @@ class LineToCnCommand(CnCommand):
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
 
 
-class ArcToCnCommand(CnCommand):
+class ArcToCommand(Command):
     def __init__(self, text, previous=None, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW):
         super().__init__(text, previous)
         self._label = 'CW Arc To' if arc_dir else 'CCW Arc To'
-        self._type = CnCommandType.CW_ARC_TO
+        self._type = CommandType.CW_ARC_TO
         self._arc_type = arc_type
         self._arc_dir = arc_dir
 
@@ -477,11 +477,11 @@ class ArcToCnCommand(CnCommand):
             parse_long()
 
 
-class LineToWithEndCurveCnCommand(CnCommand):
+class LineToWithEndCurveCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Line To (e)'
-        self._type = CnCommandType.LINE_TO_END
+        self._type = CommandType.LINE_TO_END
 
         self._parse()
 
@@ -535,11 +535,11 @@ class LineToWithEndCurveCnCommand(CnCommand):
         self._geom_primitives.append(Circle(arc_center, self._r))
 
 
-class LineToWithStartCurveCnCommand(CnCommand):
+class LineToWithStartCurveCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Line To (s)'
-        self._type = CnCommandType.LINE_TO_END
+        self._type = CommandType.LINE_TO_END
 
         self._parse()
 
@@ -599,11 +599,11 @@ class LineToWithStartCurveCnCommand(CnCommand):
         self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
 
 
-class LineToWithBothCurvesCnCommand(CnCommand):
+class LineToWithBothCurvesCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
         self._label = 'Line To (b)'
-        self._type = CnCommandType.LINE_TO_BOTH
+        self._type = CommandType.LINE_TO_BOTH
 
         self._parse()
 
@@ -667,7 +667,7 @@ class CNFile:
         self._raw_lines = list()
 
         self._header = list()
-        self._cncommands = list()
+        self._commands = list()
         self._footer = list()
 
         self._load()
@@ -690,13 +690,13 @@ class CNFile:
                     command_block = line
                     continue
                 else:
-                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._cncommands else self._cncommands[-1]))
+                    self._commands.append(Command.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
                     command_block = line
 
             elif not line or 'M30' in line:
                 self._footer.append(line)
                 if command_block:
-                    self._cncommands.append(CnCommand.from_lines(command_block, previous=None if not self._cncommands else self._cncommands[-1]))
+                    self._commands.append(Command.from_lines(command_block, previous=None if not self._commands else self._commands[-1]))
                 command_block = ''
 
             else:
@@ -704,4 +704,4 @@ class CNFile:
 
     @property
     def length(self):
-        return sum((el.length for el in self._cncommands))
+        return sum(el.length for el in self._commands)

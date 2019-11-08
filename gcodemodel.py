@@ -39,7 +39,7 @@ class GcodeModel(QAbstractTableModel):
 
     def _init(self):
         self.beginResetModel()
-        self._data = self._cnFile._cncommands
+        self._data = self._cnFile._commands
         self.endResetModel()
 
     def loadDesign(self, filename):
