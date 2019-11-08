@@ -473,12 +473,12 @@ class ArcToCommand(Command):
             params1 = line3.gcodes[0].params
             params2 = line4.gcodes[0].params
 
-            self._geom_end_point = Point2(params2['X'].value, params2['Y'].value)
-
             arc1_end = Point2(params1['X'].value, params1['Y'].value)
             center1 = Point2(params1['I'].value, params1['J'].value)
             arc2_end = Point2(params2['X'].value, params2['Y'].value)
             center2 = Point2(params2['I'].value, params2['J'].value)
+
+            self._geom_end_point = arc2_end
 
             self._r = round(math.sqrt(pow(self._geom_end_point.x - center1.x, 2) +
                                       pow(self._geom_end_point.y - center1.y, 2)), 1)
