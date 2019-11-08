@@ -393,7 +393,7 @@ class LineToCommand(Command):
 
     @property
     def length(self):
-        return self._geom_primitives[0].length
+        return sum(p.length for p in self._geom_primitives)
 
     @property
     def enabled(self):
@@ -464,7 +464,6 @@ class ArcToCommand(Command):
             self._x = self._geom_end_point.x
             self._y = self._geom_end_point.y
 
-            # TODO create actual arc
             self._geom_primitives.append(Arc(center, self._r, self._geom_start_point, self._geom_end_point))
 
         def parse_long():
@@ -524,8 +523,7 @@ class LineToWithEndCurveCommand(Command):
 
     @property
     def length(self):
-        line, arc = self._geom_primitives
-        return line.length + 2 * math.pi * arc.r
+        return sum(p.length for p in self._geom_primitives)
 
     def _parse(self):
         super()._parse()
@@ -555,7 +553,7 @@ class LineToWithEndCurveCommand(Command):
 
         # TODO calc actual arc
         self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
-        self._geom_primitives.append(Circle(arc_center, self._r))
+        self._geom_primitives.append(Arc(arc_center, self._r, line_end, arc_end))
 
 
 class LineToWithStartCurveCommand(Command):
@@ -588,8 +586,7 @@ class LineToWithStartCurveCommand(Command):
 
     @property
     def length(self):
-        arc, line = self._geom_primitives
-        return 2 * math.pi * arc.r + line.length
+        return sum(p.length for p in self._geom_primitives)
 
     def _parse(self):
         super()._parse()
@@ -618,8 +615,8 @@ class LineToWithStartCurveCommand(Command):
         self._y = round(line_end.y, 1)
 
         # TODO calc actual arc
-        self._geom_primitives.append(Circle(arc_center, self._r))
-        self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
+        self._geom_primitives.append(Arc(arc_center, self._r, self._geom_start_point, arc_end))
+        self._geom_primitives.append(LineSegment2(arc_end, line_end))
 
 
 class LineToWithBothCurvesCommand(Command):
@@ -646,8 +643,7 @@ class LineToWithBothCurvesCommand(Command):
 
     @property
     def length(self):
-        arc1, line, arc2 = self._geom_primitives
-        return 2 * math.pi * arc1.r + line.length + 2 * math.pi + arc2.r
+        return sum(p.length for p in self._geom_primitives)
 
     def _parse(self):
         super()._parse()
@@ -679,9 +675,9 @@ class LineToWithBothCurvesCommand(Command):
         self._y = round(end_point.y, 1)
         self._r = round(arc2_rad, 1)
 
-        self._geom_primitives.append(Circle(arc1_center, arc1_rad))
+        self._geom_primitives.append(Arc(arc1_center, arc1_rad, self._geom_start_point, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
-        self._geom_primitives.append(Circle(arc2_center, arc2_rad))
+        self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
 
 
 class CNFile:
