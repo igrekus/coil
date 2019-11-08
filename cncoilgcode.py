@@ -465,7 +465,7 @@ class ArcToCommand(Command):
             self._y = self._geom_end_point.y
 
             # TODO create actual arc
-            self._geom_primitives.append(Circle(center, self._r))
+            self._geom_primitives.append(Arc(center, self._r, self._geom_start_point, self._geom_end_point))
 
         def parse_long():
             *_, line3, line4 = self._cnc_lines
@@ -486,8 +486,8 @@ class ArcToCommand(Command):
             self._y = self._geom_end_point.y
 
             # TODO calc actual arc
-            self._geom_primitives.append(Circle(center1, self._r))
-            self._geom_primitives.append(Circle(center2, self._r))
+            self._geom_primitives.append(Arc(center1, self._r, self._geom_start_point, arc1_end))
+            self._geom_primitives.append(Arc(center2, self._r, arc1_end, arc2_end))
 
         super()._parse()
         self._index = self._cnc_lines[0].gcodes[0].number
