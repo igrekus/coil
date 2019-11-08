@@ -39,6 +39,29 @@ class ArcDirection(Enum):
     CW, CCW = range(2)
 
 
+class Arc(Circle):
+    def __init__(self, center: Point2, radius: float, p1: Point2, p2: Point2):
+        super().__init__(center=center, radius=radius)
+        self.p1 = p1.copy()
+        self.p2 = p2.copy()
+
+    def __str__(self):
+        return f'Arc(<{self.c.x:.2f}>, <{self.c.y:.2f}>, ' \
+               f'radius={self.r:.2f}, ' \
+               f'start=(<{self.p1.x:.2f}>, <{self.p2.y:.2f}>)' \
+               f'end=(<{self.p2.x:.2f}>, <{self.p2.y:.2f}>))'
+
+    @property
+    def length(self):
+        b = LineSegment2(self.p1, self.c).length
+        c = LineSegment2(self.p2, self.c).length
+        a = LineSegment2(self.p1, self.p2).length
+        cosa = (pow(b, 2) + pow(c, 2) - pow(a, 2)) / \
+               (2 * b * c)
+        angle = math.acos(cosa)
+        return self.r * angle
+
+
 arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
