@@ -4,29 +4,13 @@ from PyQt5.QtGui import QBrush, QColor
 from cncoilgcode import CNFile
 
 COLOR_DISABLED = '#DDDDDD'
-GCODE_COMMAND_LABELS = {
-    'M70': 'Weld',
-    'M71': 'Sono up',
-    'M72': 'Sono mid',
-    'M73': 'Sono low',
-    'M74': 'Cut wire',
-    'M75': 'Embed on',
-    'M76': 'Embed off',
-    'M77': 'Pull wire',
-    'M78': 'Hold module',
-    'M79': 'Release module',
-    'M80': 'Brake on',
-    'M81': 'Brake off',
-    'M82': 'Thermode mid',
-    'M83': 'Thermode up'
-}
 
 
 class GcodeModel(QAbstractTableModel):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.currentFile = ".\\gcode\\vcomtest.cnc"
+        self.currentFile = ".\\gcode\\vgeotest.cnc"
 
         self.currentDir = '\\'.join(self.currentFile.split('\\')[:-1])
 
@@ -118,31 +102,11 @@ class GcodeModel(QAbstractTableModel):
         row = index.row()
         col = index.column()
 
-        if col == 0:
+        if col not in self._data[row].enabled:
             return f ^ Qt.ItemIsEnabled
-
-        command = self._data[row]['gcode']
-        if command == 'G01':
-            if col in (5, 8, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command == 'G02' or command == 'G03':
-            if col in (8, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command == 'M501':
-            if col in (2, 3, 4, 5, 6, 9):
-                return f ^ Qt.ItemIsEnabled
-
-        elif command in GCODE_COMMAND_LABELS:
-            if col in range(2, 9):
-                return f ^ Qt.ItemIsEnabled
 
         return f
 
     @property
     def length(self):
-        lng = 0
-        for c in self._commands:
-            lng += len(c)
-        return lng
+        return self._cnFile.length
