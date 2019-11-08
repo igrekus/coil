@@ -4,22 +4,6 @@ from PyQt5.QtGui import QBrush, QColor
 from cncoilgcode import CNFile
 
 COLOR_DISABLED = '#DDDDDD'
-GCODE_COMMAND_LABELS = {
-    'M70': 'Weld',
-    'M71': 'Sono up',
-    'M72': 'Sono mid',
-    'M73': 'Sono low',
-    'M74': 'Cut wire',
-    'M75': 'Embed on',
-    'M76': 'Embed off',
-    'M77': 'Pull wire',
-    'M78': 'Hold module',
-    'M79': 'Release module',
-    'M80': 'Brake on',
-    'M81': 'Brake off',
-    'M82': 'Thermode mid',
-    'M83': 'Thermode up'
-}
 
 
 class GcodeModel(QAbstractTableModel):
