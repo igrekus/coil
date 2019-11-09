@@ -1,0 +1,16 @@
+//CNC-Profile written by CN-Coil Designer
+//Datetime: 11.14.2019 - 15:22:35
+%
+:
+G71
+G90
+N001 M500 P0
+     F12000
+     G01 X0 Y7 Z0
+     G02 X.8786796564 Y9.1213203436 Z0 I3 J7 K0 (ROUNDED EDGE!)
+N002 M500 P0
+     F12000
+     G02 X3 Y10 Z0 I3 J7 K0 (ROUNDED EDGE!)
+     G01 X10 Y10 Z0
+
+M30
