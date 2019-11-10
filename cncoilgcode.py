@@ -659,13 +659,13 @@ class LineToWithBothCurvesCommand(Command):
 
         arc1_end = Point2(params_arc1['X'].value, params_arc1['Y'].value)
         arc1_center = Point2(params_arc1['I'].value, params_arc1['J'].value)
-        arc1_rad = round(math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2)), 1)
+        arc1_rad = math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2))
 
         line_end = Point2(params_line['X'].value, params_line['Y'].value)
 
         arc2_end = Point2(params_arc2['X'].value, params_arc2['Y'].value)
         arc2_center = Point2(params_arc2['I'].value, params_arc2['J'].value)
-        arc2_rad = round(math.sqrt(pow(arc2_end.x - arc2_center.x, 2) + pow(arc2_end.y - arc2_center.y, 2)), 1)
+        arc2_rad = math.sqrt(pow(arc2_end.x - arc2_center.x, 2) + pow(arc2_end.y - arc2_center.y, 2))
 
         l1 = Line2(arc2_center, arc2_end)
         l2 = Line2(arc1_end, line_end)
