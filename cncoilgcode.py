@@ -48,7 +48,7 @@ class Arc(Circle):
     def __str__(self):
         return f'Arc(<{self.c.x:.2f}>, <{self.c.y:.2f}>, ' \
                f'radius={self.r:.2f}, ' \
-               f'start=(<{self.p1.x:.2f}>, <{self.p2.y:.2f}>)' \
+               f'start=(<{self.p1.x:.2f}>, <{self.p1.y:.2f}>) ' \
                f'end=(<{self.p2.x:.2f}>, <{self.p2.y:.2f}>))'
 
     @property
@@ -72,11 +72,11 @@ class Command:
 
         self._type: CommandType = CommandType.UNDEFINED
         self._previous: Command = previous
-        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point
+        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point.copy()
 
         self._cnc_lines: list = list()
 
-        self._geom_end_point: Point2 = self._geom_start_point
+        self._geom_end_point: Point2 = self._geom_start_point.copy()
         self._geom_primitives = list()
 
         self._index: int = 0
@@ -675,6 +675,8 @@ class LineToWithBothCurvesCommand(Command):
         self._x = round(end_point.x, 1)
         self._y = round(end_point.y, 1)
         self._r = round(arc2_rad, 1)
+
+        self._geom_end_point = arc2_end.copy()
 
         self._geom_primitives.append(Arc(arc1_center, arc1_rad, arc1_begin, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
