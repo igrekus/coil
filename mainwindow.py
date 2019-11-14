@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         self._ui.editLength.setText(f'{coil._length:.2f} мм')
         self._ui.editCapacitance.setText(f'{capacitance:.2f} пФ')
         self._ui.editInductance.setText(f'{inductance:.2f} мГн')
-        self._ui.editFreq.setText(f'{freq} Гц')
+        self._ui.editFreq.setText(f'{freq * 1_000:.2f} кГц')
 
 
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
