@@ -72,6 +72,10 @@ class MainWindow(QMainWindow):
         self._ui.editGcodeFile.setText(os.path.normpath(filename))
         self._ui.editLength.setText(str(self._gcodeModel.length))
 
+        self.sceneGcode.clear()
+        for item in self._gcodeModel.viewItems:
+            self.sceneGcode.addItem(item)
+
     @pyqtSlot()
     def on_btnCalc_clicked(self):
         coil = CoilParams(

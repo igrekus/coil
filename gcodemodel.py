@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
 from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsLineItem
 
-from cncoilgcode import CNFile
+from cncoilgcode import *
 
 COLOR_DISABLED = '#DDDDDD'
 
@@ -110,3 +111,11 @@ class GcodeModel(QAbstractTableModel):
     @property
     def length(self):
         return self._cnFile.length
+
+    @property
+    def viewItems(self):
+        items = list()
+        zoom = 10
+        for c in self._cnFile._commands:
+            items.append(QGraphicsLineItem(c.p1.x * zoom, -c.p1.y * zoom, c.p2.x * zoom, -c.p2.y * zoom))
+        return items

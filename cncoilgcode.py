@@ -126,6 +126,14 @@ class Command:
     def length(self):
         return 0
 
+    @property
+    def p1(self):
+        return Point2(self._geom_start_point.x, self._geom_start_point.y)
+
+    @property
+    def p2(self):
+        return Point2(self._geom_end_point.x, self._geom_end_point.y)
+
     @staticmethod
     def from_lines(text, previous):
         lines = text.split('\n')
