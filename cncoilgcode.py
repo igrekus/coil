@@ -48,7 +48,7 @@ class Arc(Circle):
     def __str__(self):
         return f'Arc(<{self.c.x:.2f}>, <{self.c.y:.2f}>, ' \
                f'radius={self.r:.2f}, ' \
-               f'start=(<{self.p1.x:.2f}>, <{self.p2.y:.2f}>)' \
+               f'start=(<{self.p1.x:.2f}>, <{self.p1.y:.2f}>) ' \
                f'end=(<{self.p2.x:.2f}>, <{self.p2.y:.2f}>))'
 
     @property
