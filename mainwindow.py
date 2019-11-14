@@ -11,22 +11,20 @@ from gcodemodel import GcodeModel
 
 
 class CoilParams:
-    def __init__(self, gap, loops, diam, dielec, magnet, length):
-        self._wire_gap = gap
-        self._loop_count = loops
-        self._wire_diameter = diam
-        self._dielectricConst = dielec
-        self._magneticConst = magnet
-        self._length = length
+    def __init__(self, gap, diam, dielec, magnet, length):
+        self.wire_gap = gap
+        self.wire_diameter = diam
+        self.dielectric_const = dielec
+        self.magnetic_const = magnet
+        self.length = length
 
     def __str__(self):
         return f'CoilParams(' \
-               f'g={self._wire_gap}' \
-               f' n={self._loop_count}' \
-               f' d={self._wire_diameter}' \
-               f' eps={self._dielectricConst}' \
-               f' mag={self._magneticConst}' \
-               f' len={self._length})'
+               f'g={self.wire_gap}' \
+               f' d={self.wire_diameter}' \
+               f' eps={self.dielectric_const}' \
+               f' mag={self.magnetic_const}' \
+               f' len={self.length})'
 
 
 class MainWindow(QMainWindow):
@@ -80,7 +78,6 @@ class MainWindow(QMainWindow):
     def on_btnCalc_clicked(self):
         coil = CoilParams(
             gap=self._ui.spinWireGap.value(),
-            loops=self._ui.spinLoopCount.value(),
             diam=self._ui.spinWireDiameter.value(),
             dielec=self._ui.spinDielectricConst.value(),
             magnet=self._ui.spinMagneticConst.value(),
@@ -91,18 +88,18 @@ class MainWindow(QMainWindow):
 
     def _calcElectricParams(self, coil):
 
-        capacitance = (math.pi * coil._dielectricConst * coil._length) / \
-                      math.log1p((coil._wire_gap - coil._wire_diameter) / coil._wire_diameter)
+        capacitance = (math.pi * coil.dielectric_const * coil.length) / \
+            math.log1p((coil.wire_gap - coil.wire_diameter) / coil.wire_diameter)
 
-        inductance = ((coil._magneticConst * coil._length) / math.pi) * \
-                     math.log1p((coil._wire_gap / 2) / (coil._wire_diameter / 2))
+        inductance = ((coil.magnetic_const * coil.length) / math.pi) * \
+            math.log1p((coil.wire_gap / 2) / (coil.wire_diameter / 2))
 
         freq = 1 / (2 * math.pi * math.sqrt(inductance * capacitance))
 
-        self._ui.editLength.setText(f'{coil._length:.2f} мм')
+        self._ui.editLength.setText(f'{coil.length:.2f} мм')
         self._ui.editCapacitance.setText(f'{capacitance:.2f} пФ')
         self._ui.editInductance.setText(f'{inductance:.2f} мГн')
-        self._ui.editFreq.setText(f'{freq} Гц')
+        self._ui.editFreq.setText(f'{freq * 1_000:.2f} кГц')
 
 
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
