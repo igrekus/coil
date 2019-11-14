@@ -11,9 +11,8 @@ from gcodemodel import GcodeModel
 
 
 class CoilParams:
-    def __init__(self, gap, loops, diam, dielec, magnet, length):
+    def __init__(self, gap, diam, dielec, magnet, length):
         self.wire_gap = gap
-        self.loop_count = loops
         self.wire_diameter = diam
         self.dielectric_const = dielec
         self.magnetic_const = magnet
@@ -22,7 +21,6 @@ class CoilParams:
     def __str__(self):
         return f'CoilParams(' \
                f'g={self.wire_gap}' \
-               f' n={self.loop_count}' \
                f' d={self.wire_diameter}' \
                f' eps={self.dielectric_const}' \
                f' mag={self.magnetic_const}' \
@@ -80,7 +78,6 @@ class MainWindow(QMainWindow):
     def on_btnCalc_clicked(self):
         coil = CoilParams(
             gap=self._ui.spinWireGap.value(),
-            loops=self._ui.spinLoopCount.value(),
             diam=self._ui.spinWireDiameter.value(),
             dielec=self._ui.spinDielectricConst.value(),
             magnet=self._ui.spinMagneticConst.value(),
