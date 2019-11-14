@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
         # create instance variables
         self._ui = uic.loadUi("mainwindow.ui", self)
 
-        self.scene = QGraphicsScene()
-        self._ui.viewport.setScene(self.scene)
+        self.sceneGcode = QGraphicsScene()
+        self._ui.viewGcode.setScene(self.sceneGcode)
 
         self._cnc = list()
         self._geometry = list()
@@ -71,6 +71,10 @@ class MainWindow(QMainWindow):
         self._gcodeModel.loadDesign(filename)
         self._ui.editGcodeFile.setText(os.path.normpath(filename))
         self._ui.editLength.setText(str(self._gcodeModel.length))
+
+        self.sceneGcode.clear()
+        for item in self._gcodeModel.viewItems:
+            self.sceneGcode.addItem(item)
 
     @pyqtSlot()
     def on_btnCalc_clicked(self):

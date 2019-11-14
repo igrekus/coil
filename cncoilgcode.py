@@ -126,6 +126,14 @@ class Command:
     def length(self):
         return 0
 
+    @property
+    def p1(self):
+        return Point2(self._geom_start_point.x, self._geom_start_point.y)
+
+    @property
+    def p2(self):
+        return Point2(self._geom_end_point.x, self._geom_end_point.y)
+
     @staticmethod
     def from_lines(text, previous):
         lines = text.split('\n')
@@ -445,7 +453,6 @@ class ArcToCommand(Command):
 
     @property
     def length(self):
-        # TODO calc actual arc length
         return sum(p.length for p in self._geom_primitives)
 
     def _parse(self):
@@ -484,7 +491,6 @@ class ArcToCommand(Command):
             self._x = self._geom_end_point.x
             self._y = self._geom_end_point.y
 
-            # TODO calc actual arc
             self._geom_primitives.append(Arc(center1, self._r, self._geom_start_point, arc1_end))
             self._geom_primitives.append(Arc(center2, self._r, arc1_end, arc2_end))
 
@@ -551,7 +557,6 @@ class LineToWithEndCurveCommand(Command):
         self._x = round(end_point.x, 1)
         self._y = round(end_point.y, 1)
 
-        # TODO calc actual arc
         self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
         self._geom_primitives.append(Arc(arc_center, self._r, line_end, arc_end))
 
@@ -614,7 +619,6 @@ class LineToWithStartCurveCommand(Command):
         self._x = round(line_end.x, 1)
         self._y = round(line_end.y, 1)
 
-        # TODO calc actual arc
         self._geom_primitives.append(Arc(arc_center, self._r, self._geom_start_point, arc_end))
         self._geom_primitives.append(LineSegment2(arc_end, line_end))
 
