@@ -72,11 +72,11 @@ class Command:
 
         self._type: CommandType = CommandType.UNDEFINED
         self._previous: Command = previous
-        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point
+        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point.copy()
 
         self._cnc_lines: list = list()
 
-        self._geom_end_point: Point2 = self._geom_start_point
+        self._geom_end_point: Point2 = self._geom_start_point.copy()
         self._geom_primitives = list()
 
         self._index: int = 0
@@ -675,6 +675,8 @@ class LineToWithBothCurvesCommand(Command):
         self._x = round(end_point.x, 1)
         self._y = round(end_point.y, 1)
         self._r = round(arc2_rad, 1)
+
+        self._geom_end_point = arc2_end.copy()
 
         self._geom_primitives.append(Arc(arc1_center, arc1_rad, arc1_begin, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
