@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
         # create instance variables
         self._ui = uic.loadUi("mainwindow.ui", self)
 
-        self.scene = QGraphicsScene()
-        self._ui.viewport.setScene(self.scene)
+        self.sceneGcode = QGraphicsScene()
+        self._ui.viewGcode.setScene(self.sceneGcode)
 
         self._cnc = list()
         self._geometry = list()
