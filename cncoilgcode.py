@@ -657,15 +657,16 @@ class LineToWithBothCurvesCommand(Command):
         params_line = line4.gcodes[0].params
         params_arc2 = line5.gcodes[0].params
 
+        arc1_begin = self._geom_start_point.copy()
         arc1_end = Point2(params_arc1['X'].value, params_arc1['Y'].value)
         arc1_center = Point2(params_arc1['I'].value, params_arc1['J'].value)
-        arc1_rad = round(math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2)), 1)
+        arc1_rad = math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2))
 
         line_end = Point2(params_line['X'].value, params_line['Y'].value)
 
         arc2_end = Point2(params_arc2['X'].value, params_arc2['Y'].value)
         arc2_center = Point2(params_arc2['I'].value, params_arc2['J'].value)
-        arc2_rad = round(math.sqrt(pow(arc2_end.x - arc2_center.x, 2) + pow(arc2_end.y - arc2_center.y, 2)), 1)
+        arc2_rad = math.sqrt(pow(arc2_end.x - arc2_center.x, 2) + pow(arc2_end.y - arc2_center.y, 2))
 
         l1 = Line2(arc2_center, arc2_end)
         l2 = Line2(arc1_end, line_end)
@@ -675,7 +676,7 @@ class LineToWithBothCurvesCommand(Command):
         self._y = round(end_point.y, 1)
         self._r = round(arc2_rad, 1)
 
-        self._geom_primitives.append(Arc(arc1_center, arc1_rad, self._geom_start_point, arc1_end))
+        self._geom_primitives.append(Arc(arc1_center, arc1_rad, arc1_begin, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
         self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
 
