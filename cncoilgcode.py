@@ -657,6 +657,7 @@ class LineToWithBothCurvesCommand(Command):
         params_line = line4.gcodes[0].params
         params_arc2 = line5.gcodes[0].params
 
+        arc1_begin = self._geom_start_point.copy()
         arc1_end = Point2(params_arc1['X'].value, params_arc1['Y'].value)
         arc1_center = Point2(params_arc1['I'].value, params_arc1['J'].value)
         arc1_rad = math.sqrt(pow(arc1_end.x - arc1_center.x, 2) + pow(arc1_end.y - arc1_center.y, 2))
@@ -675,7 +676,7 @@ class LineToWithBothCurvesCommand(Command):
         self._y = round(end_point.y, 1)
         self._r = round(arc2_rad, 1)
 
-        self._geom_primitives.append(Arc(arc1_center, arc1_rad, self._geom_start_point, arc1_end))
+        self._geom_primitives.append(Arc(arc1_center, arc1_rad, arc1_begin, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
         self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
 
