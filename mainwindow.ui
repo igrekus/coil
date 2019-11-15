@@ -50,7 +50,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="lblWireGap">
                <property name="text">
-                <string>Зазор</string>
+                <string>Шаг витка</string>
                </property>
               </widget>
              </item>
@@ -86,13 +86,13 @@
                 <string> мм</string>
                </property>
                <property name="minimum">
-                <double>0.100000000000000</double>
+                <double>0.010000000000000</double>
                </property>
                <property name="maximum">
-                <double>10.000000000000000</double>
+                <double>1.000000000000000</double>
                </property>
                <property name="singleStep">
-                <double>0.100000000000000</double>
+                <double>0.010000000000000</double>
                </property>
               </widget>
              </item>
