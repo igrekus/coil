@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
 
 from gcodemodel import GcodeModel
+from jscutfile import JSCutFile
 
 
 class CoilParams:
@@ -64,7 +65,9 @@ class MainWindow(QMainWindow):
             self.sceneGcode.addItem(item)
 
     def _importJSCut(self, name):
-        print(name)
+        jscut_file = JSCutFile(name)
+        jscut_file.save()
+        self._openCNFile(jscut_file.out_filename)
 
     def _getFileName(self):
         filename, _ = QFileDialog.getOpenFileName(parent=self,
