@@ -1,8 +1,6 @@
 import math
 import os
-from copy import deepcopy
 
-import numpy
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
