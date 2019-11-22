@@ -15,10 +15,6 @@ M30
 
 file = 'gcode\\rsquare.cnc'
 
-"""
-#ЗАДАНИЕ1 Есть набор готовых и находящихся на разной стадии разработки устройств. Определить целесообразность доведения разрабатываемых устройств до производства, учитывая стоимость доработок, себестоимость производства, востребованность у потенциальных покупателей. Востребованность должна учитывать текущий рынок как отечественных, так и зарубежных аналогов.
-"""
-
 
 def convert(in_file, out_file):
     with open(in_file, mode='rt', encoding='utf-8') as f:
@@ -37,7 +33,7 @@ def convert(in_file, out_file):
 
     with open(f'V{out_file.upper()}.CNC', mode='wt', encoding='utf-8') as f:
         f.write(header)
-        for index, line in enumerate(lines):
+        for index, line in enumerate(reversed(lines)):
             s = f'N{index + 1:03d} M500 P0\n     F12000\n     {line} Z0\n'
             print(s)
             f.write(s)
