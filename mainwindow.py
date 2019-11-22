@@ -1,13 +1,12 @@
 import math
 import os
-from copy import deepcopy
 
-import numpy
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
 
 from gcodemodel import GcodeModel
+from jscutfile import JSCutFile
 
 
 class CoilParams:
@@ -54,25 +53,41 @@ class MainWindow(QMainWindow):
         self._ui.editGcodeFile.setText(self._gcodeModel.currentFile)
         self._ui.tableGcode.resizeColumnsToContents()
 
-    @pyqtSlot()
-    def on_btnOpenGcodeFile_clicked(self):
-        filename, _ = QFileDialog.getOpenFileName(parent=self,
-                                                  caption='Открыть дизайн...',
-                                                  directory=self._currentDir,
-                                                  filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
+    def _openCNFile(self, name):
+        self._currentDir = os.path.dirname(name)
 
-        if not filename:
-            return
-
-        self._currentDir = os.path.dirname(filename)
-
-        self._gcodeModel.loadDesign(filename)
-        self._ui.editGcodeFile.setText(os.path.normpath(filename))
+        self._gcodeModel.loadDesign(name)
+        self._ui.editGcodeFile.setText(os.path.normpath(name))
         self._ui.editLength.setText(str(self._gcodeModel.length))
 
         self.sceneGcode.clear()
         for item in self._gcodeModel.viewItems:
             self.sceneGcode.addItem(item)
+
+    def _importJSCut(self, name):
+        jscut_file = JSCutFile(name)
+        jscut_file.save()
+        self._openCNFile(jscut_file.out_filename)
+
+    def _getFileName(self):
+        filename, _ = QFileDialog.getOpenFileName(parent=self,
+                                                  caption='Открыть дизайн...',
+                                                  directory=self._currentDir,
+                                                  filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
+        return filename
+
+
+    @pyqtSlot()
+    def on_btnOpenGcodeFile_clicked(self):
+        fn = self._getFileName()
+        if fn:
+            self._openCNFile(fn)
+
+    @pyqtSlot()
+    def on_btnImport_clicked(self):
+        fn = self._getFileName()
+        if fn:
+            self._importJSCut(fn)
 
     @pyqtSlot()
     def on_btnCalc_clicked(self):
