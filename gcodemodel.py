@@ -108,6 +108,9 @@ class GcodeModel(QAbstractTableModel):
 
         return f
 
+    def shiftGeometry(self, direction, value, rows):
+        print(direction, value, rows)
+
     @property
     def length(self):
         return self._cnFile.length

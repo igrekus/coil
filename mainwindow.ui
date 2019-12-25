@@ -141,6 +141,57 @@
                </property>
               </widget>
              </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="lblShift">
+               <property name="text">
+                <string>Сдвиг</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="spinShift">
+               <property name="suffix">
+                <string> мм</string>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QPushButton" name="btnLeft">
+               <property name="text">
+                <string>&lt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QPushButton" name="btnRight">
+               <property name="text">
+                <string>&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QPushButton" name="btnUp">
+               <property name="text">
+                <string>^</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QPushButton" name="btnDown">
+               <property name="text">
+                <string>V</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -210,7 +261,7 @@
           <item>
            <widget class="QTableView" name="tableGcode">
             <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
+             <enum>QAbstractItemView::ExtendedSelection</enum>
             </property>
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectItems</enum>
@@ -262,7 +313,7 @@
      <x>0</x>
      <y>0</y>
      <width>1166</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

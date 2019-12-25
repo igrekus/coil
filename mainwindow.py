@@ -76,6 +76,28 @@ class MainWindow(QMainWindow):
                                                   filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
         return filename
 
+    @pyqtSlot()
+    def on_btnLeft_clicked(self):
+        self._shiftItems('left', self._ui.spinShift.value())
+
+    @pyqtSlot()
+    def on_btnRight_clicked(self):
+        self._shiftItems('right', self._ui.spinShift.value())
+
+    @pyqtSlot()
+    def on_btnUp_clicked(self):
+        self._shiftItems('up', self._ui.spinShift.value())
+
+    @pyqtSlot()
+    def on_btnDown_clicked(self):
+        self._shiftItems('down', self._ui.spinShift.value())
+
+    def _shiftItems(self, direction, distance):
+        if not self._ui.tableGcode.selectionModel().hasSelection():
+            return
+
+        rows = [index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()]
+        self._gcodeModel.shiftGeometry(direction, distance, rows)
 
     @pyqtSlot()
     def on_btnOpenGcodeFile_clicked(self):
