@@ -104,17 +104,17 @@ class MainWindow(QMainWindow):
     def _calcElectricParams(self, coil):
 
         capacitance = (math.pi * coil.dielectric_const * coil.length) / \
-            math.log1p((coil.wire_gap - coil.wire_diameter) / coil.wire_diameter)
+            math.log((coil.wire_gap - coil.wire_diameter) / coil.wire_diameter)
 
         inductance = ((coil.magnetic_const * coil.length) / math.pi) * \
-            math.log1p((coil.wire_gap / 2) / (coil.wire_diameter / 2))
+            math.log((coil.wire_gap / 2) / (coil.wire_diameter / 2))
 
         freq = 1 / (2 * math.pi * math.sqrt(inductance * capacitance))
 
         self._ui.editLength.setText(f'{coil.length:.2f} мм')
         self._ui.editCapacitance.setText(f'{capacitance:.2f} пФ')
-        self._ui.editInductance.setText(f'{inductance:.2f} мГн')
-        self._ui.editFreq.setText(f'{freq * 100_000:.2f} мГц')
+        self._ui.editInductance.setText(f'{inductance:.2f} мкГн')
+        self._ui.editFreq.setText(f'{freq * 100_000:.2f} кГц')
 
 
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
