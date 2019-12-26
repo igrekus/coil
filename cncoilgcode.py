@@ -614,7 +614,7 @@ class ArcToCommand(Command):
 
             self._geom_primitives.clear()
             self._geom_primitives.append(Arc(new_center1_point, self._r, self._geom_start_point, new_arc1_end_point))
-            self._geom_primitives.append(Arc(new_center2_point, self._r, arc1_end, new_arc2_end_point))
+            self._geom_primitives.append(Arc(new_center2_point, self._r, new_arc1_end_point, new_arc2_end_point))
 
         new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
         new_end_x, new_end_y = self._geom_end_point.x, self._geom_end_point.y
