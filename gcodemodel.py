@@ -109,7 +109,9 @@ class GcodeModel(QAbstractTableModel):
         return f
 
     def shiftGeometry(self, direction, value, rows):
-        print(direction, value, rows)
+        to_shift = [row for row in rows if self._data[row].is_move]
+        for c in to_shift:
+            self._data[c].shift(direction, value)   # TODO update next command
 
     @property
     def length(self):

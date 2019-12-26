@@ -60,6 +60,9 @@ class MainWindow(QMainWindow):
         self._ui.editGcodeFile.setText(os.path.normpath(name))
         self._ui.editLength.setText(str(self._gcodeModel.length))
 
+        self._renderGeometry()
+
+    def _renderGeometry(self):
         self.sceneGcode.clear()
         for item in self._gcodeModel.viewItems:
             self.sceneGcode.addItem(item)
@@ -96,8 +99,9 @@ class MainWindow(QMainWindow):
         if not self._ui.tableGcode.selectionModel().hasSelection():
             return
 
-        rows = [index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()]
+        rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
         self._gcodeModel.shiftGeometry(direction, distance, rows)
+        self._renderGeometry()
 
     @pyqtSlot()
     def on_btnOpenGcodeFile_clicked(self):

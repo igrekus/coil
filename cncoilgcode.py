@@ -31,6 +31,16 @@ class CommandType(Enum):
         LINE_TO_BOTH = range(22)
 
 
+move_commands = [
+    CommandType.LINE_TO,
+    CommandType.CW_ARC_TO,
+    CommandType.CCW_ARC_TO,
+    CommandType.LINE_TO_END,
+    CommandType.LINE_TO_START,
+    CommandType.LINE_TO_BOTH
+]
+
+
 class ArcType(Enum):
     SHORT, LONG = range(2)
 
@@ -118,6 +128,9 @@ class Command:
     def _parse(self):
         self._cnc_lines = [Line(l) for l in self._lines]
 
+    def shift(self, direction, value):
+        pass
+
     @property
     def enabled(self):
         return ()
@@ -196,6 +209,14 @@ class Command:
             return LineToWithBothCurvesCommand(text=text, previous=previous)
         else:
             return Command(text=text, previous=previous)
+
+    @property
+    def is_move(self):
+        return False
+
+    @property
+    def as_gcode(self):
+        raise NotImplementedError
 
 
 class FillCommand(Command):
@@ -407,6 +428,10 @@ class LineToCommand(Command):
     def enabled(self):
         return 1, 2, 3, 4, 6, 7
 
+    @property
+    def is_move(self):
+        return True
+
     def _parse(self):
         super()._parse()
 
@@ -423,6 +448,38 @@ class LineToCommand(Command):
         self._y = self._geom_end_point.y
 
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
+    def shift(self, direction, value):
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_end_x, new_end_y = self._geom_end_point.x, self._geom_end_point.y
+        if direction == 'right':
+            new_start_x += value
+            new_end_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_end_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_end_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_end_y -= value
+
+        new_end_point = Point2(new_end_x, new_end_y)
+        new_start_point = Point2(new_start_x, new_start_y)
+
+        self._geom_start_point = new_start_point
+        self._geom_end_point = new_end_point
+
+        self._x = self._geom_end_point.x
+        self._y = self._geom_end_point.y
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d}'
 
 
 class ArcToCommand(Command):
@@ -454,6 +511,10 @@ class ArcToCommand(Command):
     @property
     def length(self):
         return sum(p.length for p in self._geom_primitives)
+
+    @property
+    def is_move(self):
+        return True
 
     def _parse(self):
 
@@ -504,6 +565,9 @@ class ArcToCommand(Command):
         elif len(self._cnc_lines) == 4:
             parse_long()
 
+    def shift(self, direction, value):
+        print(self.__class__.__name__, direction, value)
+
 
 class LineToWithEndCurveCommand(Command):
     def __init__(self, text, previous=None):
@@ -530,6 +594,10 @@ class LineToWithEndCurveCommand(Command):
     @property
     def length(self):
         return sum(p.length for p in self._geom_primitives)
+
+    @property
+    def is_move(self):
+        return True
 
     def _parse(self):
         super()._parse()
@@ -559,6 +627,9 @@ class LineToWithEndCurveCommand(Command):
 
         self._geom_primitives.append(LineSegment2(self._geom_start_point, line_end))
         self._geom_primitives.append(Arc(arc_center, self._r, line_end, arc_end))
+
+    def shift(self, direction, value):
+        print(self.__class__.__name__, direction, value)
 
 
 class LineToWithStartCurveCommand(Command):
@@ -593,6 +664,10 @@ class LineToWithStartCurveCommand(Command):
     def length(self):
         return sum(p.length for p in self._geom_primitives)
 
+    @property
+    def is_move(self):
+        return True
+
     def _parse(self):
         super()._parse()
         self._index = self._cnc_lines[0].gcodes[0].number
@@ -622,6 +697,9 @@ class LineToWithStartCurveCommand(Command):
         self._geom_primitives.append(Arc(arc_center, self._r, self._geom_start_point, arc_end))
         self._geom_primitives.append(LineSegment2(arc_end, line_end))
 
+    def shift(self, direction, value):
+        print(self.__class__.__name__, direction, value)
+
 
 class LineToWithBothCurvesCommand(Command):
     def __init__(self, text, previous=None):
@@ -648,6 +726,10 @@ class LineToWithBothCurvesCommand(Command):
     @property
     def length(self):
         return sum(p.length for p in self._geom_primitives)
+
+    @property
+    def is_move(self):
+        return True
 
     def _parse(self):
         super()._parse()
@@ -685,6 +767,9 @@ class LineToWithBothCurvesCommand(Command):
         self._geom_primitives.append(Arc(arc1_center, arc1_rad, arc1_begin, arc1_end))
         self._geom_primitives.append(LineSegment2(arc1_end, line_end))
         self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
+
+    def shift(self, direction, value):
+        print(self.__class__.__name__, direction, value)
 
 
 class CNFile:
