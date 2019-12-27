@@ -621,7 +621,12 @@ class ArcToCommand(Command):
         new_center1_x, new_center1_y = self._center1.x, self._center1.y
         new_center2_x, new_center2_y = self._center2.x, self._center2.y
         new_arc1_end_x, new_arc1_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
-        new_arc2_end_x, new_arc2_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+
+        new_arc2_end_x, new_arc2_end_y = 0, 0
+        try:
+            new_arc2_end_x, new_arc2_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+        except IndexError:
+            pass
 
         if direction == 'right':
             new_start_x += value
