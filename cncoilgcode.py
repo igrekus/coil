@@ -396,6 +396,7 @@ class ThermUpCommand(OneLineCommand):
         self._type = CommandType.THERM_UP
 
 
+# TODO make move base command
 class LineToCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
