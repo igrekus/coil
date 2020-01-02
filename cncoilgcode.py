@@ -580,8 +580,6 @@ class ArcToCommand(Command):
             parse_long()
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
-
         def shift_short():
             new_end_point = Point2(new_end_x, new_end_y)
             new_start_point = Point2(new_start_x, new_start_y)
