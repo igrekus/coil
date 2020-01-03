@@ -724,6 +724,50 @@ class LineToWithEndCurveCommand(Command):
     def shift(self, direction, value):
         print(self.__class__.__name__, direction, value)
 
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_line_end_x, new_line_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
+        new_arc_end_x, new_arc_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+        new_arc_center_x, new_arc_center_y = self._geom_primitives[1].c.x, self._geom_primitives[1].c.y
+
+        if direction == 'right':
+            new_start_x += value
+            new_line_end_x += value
+            new_arc_end_x += value
+            new_arc_center_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_line_end_x -= value
+            new_arc_end_x -= value
+            new_arc_center_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_line_end_y += value
+            new_arc_end_y += value
+            new_arc_center_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_line_end_y -= value
+            new_arc_end_y -= value
+            new_arc_center_y -= value
+
+        new_start_point = Point2(new_start_x, new_start_y)
+        new_line_end_point = Point2(new_line_end_x, new_line_end_y)
+        new_arc_end_point = Point2(new_arc_end_x, new_arc_end_y)
+        new_arc_center_point = Point2(new_arc_center_x, new_arc_center_y)
+
+        self._geom_end_point = new_arc_end_point
+        self._geom_start_point = new_start_point
+        l1 = Line2(new_start_point, new_line_end_point)
+        l2 = Line2(new_arc_center_point, new_arc_end_point)
+        new_end_point = l2.intersect(l1)
+
+        self._x = round(new_end_point.x, 1)
+        self._y = round(new_end_point.y, 1)
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, new_line_end_point))
+        self._geom_primitives.append(Arc(new_arc_center_point, self._r, new_line_end_point, new_arc_end_point))
+
 
 class LineToWithStartCurveCommand(Command):
     def __init__(self, text, previous=None):
