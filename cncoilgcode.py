@@ -949,7 +949,71 @@ class LineToWithBothCurvesCommand(Command):
         self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+
+        new_arc1_end_x, new_arc1_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
+        new_arc1_center_x, new_arc1_center_y = self._geom_primitives[0].c.x, self._geom_primitives[0].c.y
+
+        new_line_end_x, new_line_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+
+        new_arc2_end_x, new_arc2_end_y = self._geom_primitives[2].p2.x, self._geom_primitives[2].p2.y
+        new_arc2_center_x, new_arc2_center_y = self._geom_primitives[2].c.x, self._geom_primitives[2].c.y
+
+        if direction == 'right':
+            new_start_x += value
+            new_arc1_end_x += value
+            new_arc1_center_x += value
+            new_line_end_x += value
+            new_arc2_end_x += value
+            new_arc2_center_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_arc1_end_x -= value
+            new_arc1_center_x -= value
+            new_line_end_x -= value
+            new_arc2_end_x -= value
+            new_arc2_center_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_arc1_end_y += value
+            new_arc1_center_y += value
+            new_line_end_y += value
+            new_arc2_end_y += value
+            new_arc2_center_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_arc1_end_y -= value
+            new_arc1_center_y -= value
+            new_line_end_y -= value
+            new_arc2_end_y -= value
+            new_arc2_center_y -= value
+
+        new_arc1_start_point = Point2(new_start_x, new_start_y)
+        new_arc1_end_point = Point2(new_arc1_end_x, new_arc1_end_y)
+        new_arc1_center_point = Point2(new_arc1_center_x, new_arc1_center_y)
+        new_arc1_rad = math.sqrt(pow(new_arc1_end_point.x - new_arc1_center_point.x, 2) + pow(new_arc1_end_point.y - new_arc1_center_point.y, 2))
+
+        new_line_end_point = Point2(new_line_end_x, new_line_end_y)
+
+        new_arc2_end_point = Point2(new_arc2_end_x, new_arc2_end_y)
+        new_arc2_center_point = Point2(new_arc2_center_x, new_arc2_center_y)
+        new_arc2_rad = math.sqrt(pow(new_arc2_end_point.x - new_arc2_center_point.x, 2) + pow(new_arc2_end_point.y - new_arc2_center_point.y, 2))
+
+        l1 = Line2(new_arc2_center_point, new_arc2_end_point)
+        l2 = Line2(new_arc1_end_point, new_line_end_point)
+        end_point = l1.intersect(l2)
+
+        self._x = round(end_point.x, 1)
+        self._y = round(end_point.y, 1)
+        self._r = round(new_arc2_rad, 1)
+
+        self._geom_end_point = new_arc2_end_point.copy()
+        self._geom_start_point = new_arc1_start_point.copy()
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(Arc(new_arc1_center_point, new_arc1_rad, new_arc1_start_point, new_arc1_end_point))
+        self._geom_primitives.append(LineSegment2(new_arc1_end_point, new_line_end_point))
+        self._geom_primitives.append(Arc(new_arc2_center_point, new_arc2_rad, new_line_end_point, new_arc2_end_point))
 
 
 class CNFile:
