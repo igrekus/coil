@@ -131,6 +131,12 @@ class Command:
     def shift(self, direction, value):
         pass
 
+    def shift_start(self, direction, value):
+        print('shift start', self, direction, value)
+
+    def shift_end(self, direction, value):
+        print('shift end', self, direction, value)
+
     @property
     def enabled(self):
         return ()
