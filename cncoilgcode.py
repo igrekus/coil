@@ -728,8 +728,6 @@ class LineToWithEndCurveCommand(Command):
         self._geom_primitives.append(Arc(arc_center, self._r, line_end, arc_end))
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
-
         new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
         new_line_end_x, new_line_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
         new_arc_end_x, new_arc_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
@@ -841,7 +839,6 @@ class LineToWithStartCurveCommand(Command):
         self._geom_primitives.append(LineSegment2(arc_end, line_end))
 
     def shift(self, direction, value):
-
         new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
         new_arc_end_x, new_arc_end_y = self._geom_primitives[0].p1.x, self._geom_primitives[0].p1.y
         new_arc_center_x, new_arc_center_y = self._geom_primitives[0].c.x, self._geom_primitives[0].c.y
