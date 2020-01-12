@@ -122,10 +122,10 @@ class GcodeModel(QAbstractTableModel):
         prev_ = self._find_prev_move(first)
         next_ = self._find_next_move(last)
 
-        if prev_:
+        if prev_ is not None:
             self._data[prev_].shift_end(direction, value)
 
-        if next_:
+        if next_ is not None:
             self._data[next_].shift_start(direction, value)
 
     def _find_prev_move(self, index):
