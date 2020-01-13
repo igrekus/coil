@@ -131,6 +131,12 @@ class Command:
     def shift(self, direction, value):
         pass
 
+    def shift_start(self, direction, value):
+        print('shift start', self, direction, value)
+
+    def shift_end(self, direction, value):
+        print('shift end', self, direction, value)
+
     @property
     def enabled(self):
         return ()
@@ -396,6 +402,7 @@ class ThermUpCommand(OneLineCommand):
         self._type = CommandType.THERM_UP
 
 
+# TODO make move base command
 class LineToCommand(Command):
     def __init__(self, text, previous=None):
         super().__init__(text, previous)
@@ -489,6 +496,8 @@ class ArcToCommand(Command):
         self._type = CommandType.CW_ARC_TO
         self._arc_type = arc_type
         self._arc_dir = arc_dir
+        self._center1 = Point2()
+        self._center2 = Point2()
 
         self._parse()
 
@@ -516,6 +525,14 @@ class ArcToCommand(Command):
     def is_move(self):
         return True
 
+    @property
+    def is_short(self):
+        return len(self._cnc_lines) == 3
+
+    @property
+    def is_long(self):
+        return len(self._cnc_lines) == 4
+
     def _parse(self):
 
         def parse_short():
@@ -526,6 +543,7 @@ class ArcToCommand(Command):
             self._geom_end_point = Point2(params['X'].value, params['Y'].value)
 
             center = Point2(params['I'].value, params['J'].value)
+            self._center1 = center
 
             self._r = round(math.sqrt(pow(self._geom_end_point.x - center.x, 2) +
                                       pow(self._geom_end_point.y - center.y, 2)), 1)
@@ -546,6 +564,8 @@ class ArcToCommand(Command):
             center2 = Point2(params2['I'].value, params2['J'].value)
 
             self._geom_end_point = arc2_end
+            self._center1 = center1
+            self._center2 = center2
 
             self._r = round(math.sqrt(pow(self._geom_end_point.x - center1.x, 2) +
                                       pow(self._geom_end_point.y - center1.y, 2)), 1)
@@ -560,13 +580,92 @@ class ArcToCommand(Command):
         self._spill = self._cnc_lines[0].block.modal_params[1].value
         self._speed = self._cnc_lines[1].gcodes[0].word.value
 
-        if len(self._cnc_lines) == 3:
+        if self.is_short:
             parse_short()
-        elif len(self._cnc_lines) == 4:
+        elif self.is_long:
             parse_long()
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
+        def shift_short():
+            new_end_point = Point2(new_end_x, new_end_y)
+            new_start_point = Point2(new_start_x, new_start_y)
+            new_center1_point = Point2(new_center1_x, new_center1_y)
+
+            self._geom_start_point = new_start_point
+            self._geom_end_point = new_end_point
+            self._center1 = new_center1_point
+
+            self._x = self._geom_end_point.x
+            self._y = self._geom_end_point.y
+
+            self._geom_primitives.clear()
+            self._geom_primitives.append(Arc(new_center1_point, self._r, self._geom_start_point, self._geom_end_point))
+
+        def shift_long():
+            new_end_point = Point2(new_end_x, new_end_y)
+            new_start_point = Point2(new_start_x, new_start_y)
+            new_center1_point = Point2(new_center1_x, new_center1_y)
+            new_center2_point = Point2(new_center1_x, new_center1_y)
+            new_arc1_end_point = Point2(new_arc1_end_x, new_arc1_end_y)
+            new_arc2_end_point = Point2(new_arc2_end_x, new_arc2_end_y)
+
+            self._geom_start_point = new_start_point
+            self._geom_end_point = new_end_point
+            self._center1 = new_center1_point
+            self._center2 = new_center2_point
+
+            self._x = self._geom_end_point.x
+            self._y = self._geom_end_point.y
+
+            self._geom_primitives.clear()
+            self._geom_primitives.append(Arc(new_center1_point, self._r, self._geom_start_point, new_arc1_end_point))
+            self._geom_primitives.append(Arc(new_center2_point, self._r, new_arc1_end_point, new_arc2_end_point))
+
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_end_x, new_end_y = self._geom_end_point.x, self._geom_end_point.y
+        new_center1_x, new_center1_y = self._center1.x, self._center1.y
+        new_center2_x, new_center2_y = self._center2.x, self._center2.y
+        new_arc1_end_x, new_arc1_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
+
+        new_arc2_end_x, new_arc2_end_y = 0, 0
+        try:
+            new_arc2_end_x, new_arc2_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+        except IndexError:
+            pass
+
+        if direction == 'right':
+            new_start_x += value
+            new_end_x += value
+            new_center1_x += value
+            new_center2_x += value
+            new_arc1_end_x += value
+            new_arc2_end_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_end_x -= value
+            new_center1_x -= value
+            new_center2_x -= value
+            new_arc1_end_x -= value
+            new_arc2_end_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_end_y += value
+            new_center1_y += value
+            new_center2_y += value
+            new_arc1_end_y += value
+            new_arc2_end_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_end_y -= value
+            new_center1_y -= value
+            new_center2_y -= value
+            new_arc1_end_y -= value
+            new_arc2_end_y -= value
+
+        if self.is_short:
+            shift_short()
+        elif self.is_long:
+            shift_long()
 
 
 class LineToWithEndCurveCommand(Command):
@@ -629,7 +728,49 @@ class LineToWithEndCurveCommand(Command):
         self._geom_primitives.append(Arc(arc_center, self._r, line_end, arc_end))
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_line_end_x, new_line_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
+        new_arc_end_x, new_arc_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+        new_arc_center_x, new_arc_center_y = self._geom_primitives[1].c.x, self._geom_primitives[1].c.y
+
+        if direction == 'right':
+            new_start_x += value
+            new_line_end_x += value
+            new_arc_end_x += value
+            new_arc_center_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_line_end_x -= value
+            new_arc_end_x -= value
+            new_arc_center_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_line_end_y += value
+            new_arc_end_y += value
+            new_arc_center_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_line_end_y -= value
+            new_arc_end_y -= value
+            new_arc_center_y -= value
+
+        new_start_point = Point2(new_start_x, new_start_y)
+        new_line_end_point = Point2(new_line_end_x, new_line_end_y)
+        new_arc_end_point = Point2(new_arc_end_x, new_arc_end_y)
+        new_arc_center_point = Point2(new_arc_center_x, new_arc_center_y)
+
+        self._geom_end_point = new_arc_end_point
+        self._geom_start_point = new_start_point
+        l1 = Line2(new_start_point, new_line_end_point)
+        l2 = Line2(new_arc_center_point, new_arc_end_point)
+        new_end_point = l2.intersect(l1)
+
+        self._x = round(new_end_point.x, 1)
+        self._y = round(new_end_point.y, 1)
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, new_line_end_point))
+        self._geom_primitives.append(Arc(new_arc_center_point, self._r, new_line_end_point, new_arc_end_point))
 
 
 class LineToWithStartCurveCommand(Command):
@@ -698,7 +839,49 @@ class LineToWithStartCurveCommand(Command):
         self._geom_primitives.append(LineSegment2(arc_end, line_end))
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_arc_end_x, new_arc_end_y = self._geom_primitives[0].p1.x, self._geom_primitives[0].p1.y
+        new_arc_center_x, new_arc_center_y = self._geom_primitives[0].c.x, self._geom_primitives[0].c.y
+        new_line_end_x, new_line_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+
+        if direction == 'right':
+            new_start_x += value
+            new_arc_end_x += value
+            new_arc_center_x += value
+            new_line_end_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_arc_end_x -= value
+            new_arc_center_x -= value
+            new_line_end_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_arc_end_y += value
+            new_arc_center_y += value
+            new_line_end_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_arc_end_y -= value
+            new_arc_center_y -= value
+            new_line_end_y -= value
+
+        new_start_point = Point2(new_start_x, new_start_y)
+        new_arc_end_point = Point2(new_arc_end_x, new_arc_end_y)
+        new_arc_center_point = Point2(new_arc_center_x, new_arc_center_y)
+        new_line_end_point = Point2(new_line_end_x, new_line_end_y)
+
+        self._geom_end_point = new_line_end_point
+        self._geom_start_point = new_start_point
+        l2 = Line2(new_arc_center_point, new_start_point)
+        l1 = Line2(new_arc_end_point, new_line_end_point)
+        new_end_point = l2.intersect(l1)
+
+        self._x = round(new_line_end_point.x, 1)
+        self._y = round(new_line_end_point.y, 1)
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(Arc(new_arc_center_point, self._r, self._geom_start_point, new_arc_end_point))
+        self._geom_primitives.append(LineSegment2(new_arc_end_point, new_line_end_point))
 
 
 class LineToWithBothCurvesCommand(Command):
@@ -769,7 +952,71 @@ class LineToWithBothCurvesCommand(Command):
         self._geom_primitives.append(Arc(arc2_center, arc2_rad, line_end, arc2_end))
 
     def shift(self, direction, value):
-        print(self.__class__.__name__, direction, value)
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+
+        new_arc1_end_x, new_arc1_end_y = self._geom_primitives[0].p2.x, self._geom_primitives[0].p2.y
+        new_arc1_center_x, new_arc1_center_y = self._geom_primitives[0].c.x, self._geom_primitives[0].c.y
+
+        new_line_end_x, new_line_end_y = self._geom_primitives[1].p2.x, self._geom_primitives[1].p2.y
+
+        new_arc2_end_x, new_arc2_end_y = self._geom_primitives[2].p2.x, self._geom_primitives[2].p2.y
+        new_arc2_center_x, new_arc2_center_y = self._geom_primitives[2].c.x, self._geom_primitives[2].c.y
+
+        if direction == 'right':
+            new_start_x += value
+            new_arc1_end_x += value
+            new_arc1_center_x += value
+            new_line_end_x += value
+            new_arc2_end_x += value
+            new_arc2_center_x += value
+        elif direction == 'left':
+            new_start_x -= value
+            new_arc1_end_x -= value
+            new_arc1_center_x -= value
+            new_line_end_x -= value
+            new_arc2_end_x -= value
+            new_arc2_center_x -= value
+        elif direction == 'up':
+            new_start_y += value
+            new_arc1_end_y += value
+            new_arc1_center_y += value
+            new_line_end_y += value
+            new_arc2_end_y += value
+            new_arc2_center_y += value
+        elif direction == 'down':
+            new_start_y -= value
+            new_arc1_end_y -= value
+            new_arc1_center_y -= value
+            new_line_end_y -= value
+            new_arc2_end_y -= value
+            new_arc2_center_y -= value
+
+        new_arc1_start_point = Point2(new_start_x, new_start_y)
+        new_arc1_end_point = Point2(new_arc1_end_x, new_arc1_end_y)
+        new_arc1_center_point = Point2(new_arc1_center_x, new_arc1_center_y)
+        new_arc1_rad = math.sqrt(pow(new_arc1_end_point.x - new_arc1_center_point.x, 2) + pow(new_arc1_end_point.y - new_arc1_center_point.y, 2))
+
+        new_line_end_point = Point2(new_line_end_x, new_line_end_y)
+
+        new_arc2_end_point = Point2(new_arc2_end_x, new_arc2_end_y)
+        new_arc2_center_point = Point2(new_arc2_center_x, new_arc2_center_y)
+        new_arc2_rad = math.sqrt(pow(new_arc2_end_point.x - new_arc2_center_point.x, 2) + pow(new_arc2_end_point.y - new_arc2_center_point.y, 2))
+
+        l1 = Line2(new_arc2_center_point, new_arc2_end_point)
+        l2 = Line2(new_arc1_end_point, new_line_end_point)
+        end_point = l1.intersect(l2)
+
+        self._x = round(end_point.x, 1)
+        self._y = round(end_point.y, 1)
+        self._r = round(new_arc2_rad, 1)
+
+        self._geom_end_point = new_arc2_end_point.copy()
+        self._geom_start_point = new_arc1_start_point.copy()
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(Arc(new_arc1_center_point, new_arc1_rad, new_arc1_start_point, new_arc1_end_point))
+        self._geom_primitives.append(LineSegment2(new_arc1_end_point, new_line_end_point))
+        self._geom_primitives.append(Arc(new_arc2_center_point, new_arc2_rad, new_line_end_point, new_arc2_end_point))
 
 
 class CNFile:

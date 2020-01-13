@@ -127,6 +127,18 @@ class MainWindow(QMainWindow):
 
         self._calcElectricParams(coil)
 
+    @pyqtSlot()
+    def on_btnAddBlock_clicked(self):
+        print('add block')
+
+    @pyqtSlot()
+    def on_btnExportBlock_clicked(self):
+        if not self._ui.tableGcode.selectionModel().hasSelection():
+            return
+
+        rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
+        print(rows)
+
     def _calcElectricParams(self, coil):
 
         capacitance = (math.pi * coil.dielectric_const * coil.length) / \

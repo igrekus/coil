@@ -110,8 +110,37 @@ class GcodeModel(QAbstractTableModel):
 
     def shiftGeometry(self, direction, value, rows):
         to_shift = [row for row in rows if self._data[row].is_move]
+        if not to_shift:
+            return
+
         for c in to_shift:
             self._data[c].shift(direction, value)   # TODO update next command
+
+        first = to_shift[0]
+        last = to_shift[-1]
+
+        prev_ = self._find_prev_move(first)
+        next_ = self._find_next_move(last)
+
+        if prev_ is not None:
+            self._data[prev_].shift_end(direction, value)
+
+        if next_ is not None:
+            self._data[next_].shift_start(direction, value)
+
+    def _find_prev_move(self, index):
+        for i in range(index - 1, -1, -1):
+            if self._data[i]._type in move_commands:
+                return i
+        else:
+            return None
+
+    def _find_next_move(self, index):
+        for i in range(index + 1, len(self._data)):
+            if self._data[i]._type in move_commands:
+                return i
+        else:
+            return None
 
     @property
     def length(self):
