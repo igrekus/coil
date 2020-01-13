@@ -484,6 +484,54 @@ class LineToCommand(Command):
         self._geom_primitives.clear()
         self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
 
+    def shift_start(self, direction, value):
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_end_x, new_end_y = self._geom_end_point.x, self._geom_end_point.y
+        if direction == 'right':
+            new_start_x += value
+        elif direction == 'left':
+            new_start_x -= value
+        elif direction == 'up':
+            new_start_y += value
+        elif direction == 'down':
+            new_start_y -= value
+
+        new_end_point = Point2(new_end_x, new_end_y)
+        new_start_point = Point2(new_start_x, new_start_y)
+
+        self._geom_start_point = new_start_point
+        self._geom_end_point = new_end_point
+
+        self._x = self._geom_end_point.x
+        self._y = self._geom_end_point.y
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
+    def shift_end(self, direction, value):
+        new_start_x, new_start_y = self._geom_start_point.x, self._geom_start_point.y
+        new_end_x, new_end_y = self._geom_end_point.x, self._geom_end_point.y
+        if direction == 'right':
+            new_end_x += value
+        elif direction == 'left':
+            new_end_x -= value
+        elif direction == 'up':
+            new_end_y += value
+        elif direction == 'down':
+            new_end_y -= value
+
+        new_end_point = Point2(new_end_x, new_end_y)
+        new_start_point = Point2(new_start_x, new_start_y)
+
+        self._geom_start_point = new_start_point
+        self._geom_end_point = new_end_point
+
+        self._x = self._geom_end_point.x
+        self._y = self._geom_end_point.y
+
+        self._geom_primitives.clear()
+        self._geom_primitives.append(LineSegment2(self._geom_start_point, self._geom_end_point))
+
     @property
     def as_gcode(self):
         return f'N{self._index:03d}'
