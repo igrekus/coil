@@ -43,9 +43,8 @@ class GcodeModel(QAbstractTableModel):
         return QVariant()
 
     def rowCount(self, parent=None, *args, **kwargs):
-        if parent.isValid():
+        if parent and parent.isValid():
             return 0
-        # FIXME: row counter
         return len(self._data)
 
     def columnCount(self, parent=None, *args, **kwargs):
