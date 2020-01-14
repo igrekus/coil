@@ -116,6 +116,20 @@ class MainWindow(QMainWindow):
             self._importJSCut(fn)
 
     @pyqtSlot()
+    def on_btnAddBlock_clicked(self):
+        fn = self._getFileName()
+        if fn:
+            self._importBlock(fn)
+
+    @pyqtSlot()
+    def on_btnExportBlock_clicked(self):
+        if not self._ui.tableGcode.selectionModel().hasSelection():
+            return
+
+        rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
+        print(rows)
+
+    @pyqtSlot()
     def on_btnCalc_clicked(self):
         coil = CoilParams(
             gap=self._ui.spinWireGap.value(),
@@ -126,18 +140,6 @@ class MainWindow(QMainWindow):
         )
 
         self._calcElectricParams(coil)
-
-    @pyqtSlot()
-    def on_btnAddBlock_clicked(self):
-        print('add block')
-
-    @pyqtSlot()
-    def on_btnExportBlock_clicked(self):
-        if not self._ui.tableGcode.selectionModel().hasSelection():
-            return
-
-        rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
-        print(rows)
 
     def _calcElectricParams(self, coil):
 
