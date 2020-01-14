@@ -43,9 +43,8 @@ class GcodeModel(QAbstractTableModel):
         return QVariant()
 
     def rowCount(self, parent=None, *args, **kwargs):
-        if parent.isValid():
+        if parent and parent.isValid():
             return 0
-        # FIXME: row counter
         return len(self._data)
 
     def columnCount(self, parent=None, *args, **kwargs):
@@ -141,6 +140,19 @@ class GcodeModel(QAbstractTableModel):
                 return i
         else:
             return None
+
+    def addBlock(self, selected_row, name):
+        target_row = selected_row
+        if selected_row == len(self._data):
+            target_row = len(self._data) - 1
+
+        block = CNFile(name)
+        self.beginResetModel()
+
+        for command in reversed(block._commands):
+            self._data.insert(target_row, command)
+
+        self.endResetModel()
 
     @property
     def length(self):
