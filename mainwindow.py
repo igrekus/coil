@@ -79,6 +79,11 @@ class MainWindow(QMainWindow):
                                                   filter='CNCoil design (*.cnc);;GCode program (*.gcode)')
         return filename
 
+    def _importBlock(self, name):
+        if not self._isSelected():
+            return
+        print(name)
+
     @pyqtSlot()
     def on_btnLeft_clicked(self):
         self._shiftItems('left', self._ui.spinShift.value())
