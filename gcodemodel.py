@@ -142,7 +142,17 @@ class GcodeModel(QAbstractTableModel):
             return None
 
     def addBlock(self, selected_row, name):
-        print(selected_row, name)
+        target_row = selected_row
+        if selected_row == len(self._data):
+            target_row = len(self._data) - 1
+
+        block = CNFile(name)
+        self.beginResetModel()
+
+        for command in reversed(block._commands):
+            self._data.insert(target_row, command)
+
+        self.endResetModel()
 
     @property
     def length(self):
