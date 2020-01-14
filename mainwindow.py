@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
         self._shiftItems('down', self._ui.spinShift.value())
 
     def _shiftItems(self, direction, distance):
-        if not self._ui.tableGcode.selectionModel().hasSelection():
+        if not self._isSelected():
             return
 
         rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_btnExportBlock_clicked(self):
-        if not self._ui.tableGcode.selectionModel().hasSelection():
+        if not self._isSelected():
             return
 
         rows = set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
