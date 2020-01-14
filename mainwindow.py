@@ -157,6 +157,9 @@ class MainWindow(QMainWindow):
         self._ui.editFreq.setText(f'{freq * 100_000:.2f} кГц')
 
 
+    def _isSelected(self):
+        return self._ui.tableGcode.selectionModel().hasSelection()
+
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
 #                                                         "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",
 #                                                         "win": "1090"},
