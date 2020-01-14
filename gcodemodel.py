@@ -152,6 +152,7 @@ class GcodeModel(QAbstractTableModel):
         for command in reversed(block._commands):
             self._data.insert(target_row, command)
 
+        # TODO make proper insertion, adjusting the move coords
         self.endResetModel()
 
     @property
