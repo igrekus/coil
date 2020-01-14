@@ -81,8 +81,11 @@ class MainWindow(QMainWindow):
 
     def _importBlock(self, name):
         if not self._isSelected():
-            return
-        print(name)
+            selected_row = self._gcodeModel.rowCount()
+        else:
+            selected_row = min(self._rowsSelected())
+
+        self._gcodeModel.addBlock(selected_row, name)
 
     @pyqtSlot()
     def on_btnLeft_clicked(self):

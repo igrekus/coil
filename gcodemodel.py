@@ -141,6 +141,9 @@ class GcodeModel(QAbstractTableModel):
         else:
             return None
 
+    def addBlock(self, selected_row, name):
+        print(selected_row, name)
+
     @property
     def length(self):
         return self._cnFile.length
