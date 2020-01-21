@@ -21,8 +21,9 @@ class FillCommand(Command):
 
     @property
     def as_gcode(self):
-        return f'N{self._index:.03d} M501 P{self._spill} P.{str(self._delay).replace(".", "")}\n' \
-               f'G04 P.{str(self._delay).replace(".", "")}'
+        sec = self._delay / 1000
+        return f'N{self._index:03d} M501 P{self._spill} P{sec}\n' \
+               f'G04 P{sec}'
 
     @classmethod
     def from_string(cls, string: str):
