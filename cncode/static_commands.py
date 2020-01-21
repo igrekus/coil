@@ -23,7 +23,7 @@ class FillCommand(Command):
     def as_gcode(self):
         sec = self._delay / 1000
         return f'N{self._index:03d} M501 P{self._spill} P{sec}\n' \
-               f'G04 P{sec}'
+               f'G04 P{sec}\n'
 
     @classmethod
     def from_string(cls, string: str):
@@ -49,7 +49,7 @@ class WeldCommand(OneLineCommand):
 
     @property
     def as_gcode(self):
-        return f'N{self._index:03d} M70 P{int(self._prm)} P0'
+        return f'N{self._index:03d} M70 P{int(self._prm)} P0\n'
 
     @classmethod
     def from_string(cls, string: str):
