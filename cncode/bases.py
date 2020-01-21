@@ -152,5 +152,4 @@ class OneLineCommand(Command, ABC):
 
         index = line1.gcodes[0].number
         prm = line1.block.modal_params[1].value
-        type_: CommandType = CommandType.UNDEFINED
-        return cls(type_=type_, index=index, prm=prm)
+        return cls(index=index, prm=prm)
