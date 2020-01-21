@@ -47,6 +47,7 @@ class WeldCommand(OneLineCommand):
 
     @classmethod
     def from_string(cls, string: str):
+        assert 'M70' in string
         inst = super().from_string(string)
         inst._type = CommandType.WELD
         inst._label = 'Weld'
@@ -63,6 +64,7 @@ class SonoUpCommand(OneLineCommand):
 
     @classmethod
     def from_string(cls, string: str):
+        assert 'M71' in string
         inst = super().from_string(string)
         inst._type = CommandType.SONO_UP
         inst._label = 'Sono Up'
