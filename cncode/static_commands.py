@@ -13,7 +13,7 @@ class FillCommand(Command):
                          prm=0.0)
 
     def __str__(self):
-        return f'FillCnCommand(n={self._index} p1={self._spill} p2={self._delay})'
+        return f'FillCnCommand(n={self._index} spill={self._spill} delay={self._delay})'
 
     @property
     def disabled(self):
