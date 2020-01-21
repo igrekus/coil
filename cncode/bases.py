@@ -119,7 +119,7 @@ class OneLineCommand(Command, ABC):
                          prm=prm)
 
     def __str__(self):
-        return f'OneLineCommand()'
+        return f'{self.__class__.__name__}(index={self._index}, prm={self._prm})'
 
     def __getitem__(self, item):
         if item in range(2, 9):

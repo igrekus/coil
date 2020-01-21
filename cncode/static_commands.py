@@ -12,9 +12,6 @@ class FillCommand(Command):
                          delay=delay,
                          prm=0.0)
 
-    def __str__(self):
-        return f'FillCnCommand(n={self._index} spill={self._spill} delay={self._delay})'
-
     @property
     def disabled(self):
         return 2, 3, 4, 5, 6, 9
@@ -43,9 +40,6 @@ class FillCommand(Command):
 class WeldCommand(OneLineCommand):
     def __init__(self, index: int=0, prm: float=0.0):
         super().__init__(type_=CommandType.WELD, index=index, label='Weld', prm=prm)
-
-    def __str__(self):
-        return f'FillCnCommand(n={self._index} prm={self._prm})'
 
     @property
     def as_gcode(self):
