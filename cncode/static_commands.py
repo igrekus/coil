@@ -51,3 +51,19 @@ class WeldCommand(OneLineCommand):
         inst._type = CommandType.WELD
         inst._label = 'Weld'
         return inst
+
+
+class SonoUpCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.SONO_UP, index=index, label='Sono Up', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M71 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        inst = super().from_string(string)
+        inst._type = CommandType.SONO_UP
+        inst._label = 'Sono Up'
+        return inst
