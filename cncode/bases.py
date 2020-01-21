@@ -1,36 +1,65 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from enum import Enum
+from pygcode import Line
 
-from euclid3 import Point2
+
+class CommandType(Enum):
+    UNDEFINED, \
+        FILL, \
+        WELD, \
+        SONO_UP, \
+        SONO_MID, \
+        SONO_LOW, \
+        CUT_WIRE, \
+        EMBED_ON, \
+        EMBED_OFF, \
+        PULL_WIRE, \
+        HOLD_MODULE, \
+        RELEASE_MODULE, \
+        BRAKE_ON, \
+        BRAKE_OFF, \
+        THERM_MID, \
+        THERM_UP, \
+        LINE_TO, \
+        CW_ARC_TO, \
+        CCW_ARC_TO, \
+        LINE_TO_END, \
+        LINE_TO_START, \
+        LINE_TO_BOTH = range(22)
+
+
+move_commands = [
+    CommandType.LINE_TO,
+    CommandType.CW_ARC_TO,
+    CommandType.CCW_ARC_TO,
+    CommandType.LINE_TO_END,
+    CommandType.LINE_TO_START,
+    CommandType.LINE_TO_BOTH
+]
+
+
+class ArcType(Enum):
+    SHORT, LONG = range(2)
+
+
+class ArcDirection(Enum):
+    CW, CCW = range(2)
+
+
+arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
 class Command(ABC):
-    def __init__(self, text, previous=None):
-        self._text: str = text
-        self._lines: list = text.split('\n')
-
-        self._type: CommandType = CommandType.UNDEFINED
-        self._previous: Command = previous
-        self._geom_start_point: Point2 = Point2(0, 0) if not previous else self._previous._geom_end_point.copy()
-
-        self._cnc_lines: list = list()
-
-        self._geom_end_point: Point2 = self._geom_start_point.copy()
-        self._geom_primitives = list()
-
-        self._index: int = 0
-        self._label: str = 'undefined'
-        self._spill: float = 0.0   # first P parameter
-        self._delay: float = 0.0   # second P parameter
-        self._prm: float = 0.0   # arbitrary parameter
-        self._x: float = 0.0
-        self._y: float = 0.0
-        self._r: float = 0.0
-        self._speed: float = 0.0
-        self._arc_type: ArcType = ArcType.SHORT
+    def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined', spill: float=0.0, delay: float=0.0, prm: float=0.0):
+        self._type: CommandType = type_
+        self._index: int = index
+        self._label: str = label
+        self._spill: float = spill   # first P parameter
+        self._delay: float = delay   # second P parameter
+        self._prm: float = prm       # arbitrary parameter
 
     def __str__(self):
-        return f'CnCommand(type={self._type})'
+        return f'AbstractCommand()'
 
     def __getitem__(self, item):
         if item == 0:
@@ -38,117 +67,93 @@ class Command(ABC):
         elif item == 1:
             return self._label
         elif item == 2:
-            return self._x
+            return ''
         elif item == 3:
-            return self._y
+            return ''
         elif item == 4:
-            return self._r
+            return ''
         elif item == 5:
-            return arc_label[self._arc_type]
+            return ''
         elif item == 6:
-            return self._speed
+            return ''
         elif item == 7:
             return self._spill
         elif item == 8:
             return self._delay
         elif item == 9:
             return self._prm
-
-    def _parse(self):
-        self._cnc_lines = [Line(l) for l in self._lines]
-
-    def shift(self, direction, value):
-        pass
-
-    def shift_start(self, direction, value):
-        print('shift start', self, direction, value)
-
-    def shift_end(self, direction, value):
-        print('shift end', self, direction, value)
+        else:
+            raise IndexError
 
     @property
-    def enabled(self):
-        return ()
+    @abstractmethod
+    def disabled(self):
+        pass
 
     @property
     def length(self):
         return 0
 
     @property
-    def p1(self):
-        return Point2(self._geom_start_point.x, self._geom_start_point.y)
-
-    @property
-    def p2(self):
-        return Point2(self._geom_end_point.x, self._geom_end_point.y)
-
-    @staticmethod
-    def from_lines(text, previous):
-        lines = text.split('\n')
-        length = len(lines)
-        if length == 1:
-            line = lines[0]
-            if 'M70' in line:
-                return WeldCommand(text=text, previous=previous)
-            elif 'M71' in line:
-                return SonoUpCommand(text=text, previous=previous)
-            elif 'M72' in line:
-                return SonoMidCommand(text=text, previous=previous)
-            elif 'M73' in line:
-                return SonoLowCommand(text=text, previous=previous)
-            elif 'M74' in line:
-                return CutWireCommand(text=text, previous=previous)
-            elif 'M75' in line:
-                return EmbedOnCommand(text=text, previous=previous)
-            elif 'M76' in line:
-                return EmbedOffCommand(text=text, previous=previous)
-            elif 'M77' in line:
-                return PullWireCommand(text=text, previous=previous)
-            elif 'M78' in line:
-                return HoldModuleCommand(text=text, previous=previous)
-            elif 'M79' in line:
-                return ReleaseModuleCommand(text=text, previous=previous)
-            elif 'M80' in line:
-                return BrakeOnCommand(text=text, previous=previous)
-            elif 'M81' in line:
-                return BrakeOffCommand(text=text, previous=previous)
-            elif 'M82' in line:
-                return ThermMidCommand(text=text, previous=previous)
-            elif 'M83' in line:
-                return ThermUpCommand(text=text, previous=previous)
-        elif length == 2:
-            return FillCommand(text=text, previous=previous)
-        elif length == 3:
-            line1, line2, line3 = lines
-            if 'G01' in line3:
-                return LineToCommand(text=text, previous=previous)
-            elif 'G02' in line3:
-                return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
-            elif 'G03' in line3:
-                return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
-        elif length == 4:
-            # long arc = arc + arc
-            *_, line3, line4 = lines
-            if 'G01' not in line3 and 'G01' not in line4:
-                if 'G02' in line3 and 'G02' in line4:
-                    return ArcToCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CW)
-                elif 'G03' in line3 and 'G03' in line4:
-                    return ArcToCommand(text=text, previous=previous, arc_type=ArcType.LONG, arc_dir=ArcDirection.CCW)
-            # line + end arc
-            elif 'G01' in line3 and 'G01' not in line4:
-                return LineToWithEndCurveCommand(text=text, previous=previous)
-            # start arc + line
-            elif 'G01' not in line3 and 'G01' in line4:
-                return LineToWithStartCurveCommand(text=text, previous=previous)
-        elif length == 5:
-            return LineToWithBothCurvesCommand(text=text, previous=previous)
-        else:
-            return Command(text=text, previous=previous)
-
-    @property
     def is_move(self):
         return False
 
     @property
+    @abstractmethod
     def as_gcode(self):
-        raise NotImplementedError
+        pass
+
+    @classmethod
+    @abstractmethod
+    def from_string(cls, string: str):
+        pass
+
+    @property
+    def command_type(self):
+        return self._type
+
+
+class OneLineCommand(Command, ABC):
+    def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined', prm: float=0.0):
+        super().__init__(type_=type_,
+                         index=index,
+                         label=label,
+                         spill=0.0,
+                         delay=0.0,
+                         prm=prm)
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(index={self._index}, prm={self._prm})'
+
+    def __getitem__(self, item):
+        if item in range(2, 9):
+            return ''
+        elif item == 0:
+            return self._index
+        elif item == 1:
+            return self._label
+        elif item == 9:
+            return self._prm
+        else:
+            raise IndexError
+
+    @property
+    def disabled(self):
+        return 2, 3, 4, 5, 6, 7, 8
+
+    @property
+    @abstractmethod
+    def as_gcode(self):
+        pass
+
+    @classmethod
+    def from_string(cls, string: str):
+        cnc_lines = [Line(l) for l in string.strip().split('\n')]
+        assert len(cnc_lines) == 1
+
+        line1 = cnc_lines[0]
+        assert line1.gcodes[0].word_letter == 'N'
+
+        index = line1.gcodes[0].number
+        prm = line1.block.modal_params[1].value
+        return cls(index=index, prm=prm)
