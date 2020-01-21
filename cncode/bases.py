@@ -1,22 +1,16 @@
 from abc import ABC, abstractmethod
 
-from pygcode import Line
 from cncode import CommandType
 
 
 class Command(ABC):
-    def __init__(self, text):
-        self._text: str = text
-        self._lines: list = text.split('\n')
-        self._cnc_lines: list = list()
-
-        self._type: CommandType = CommandType.UNDEFINED
-
-        self._index: int = 0
-        self._label: str = 'undefined'
-        self._spill: float = 0.0   # first P parameter
-        self._delay: float = 0.0   # second P parameter
-        self._prm: float = 0.0   # arbitrary parameter
+    def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined', spill: float=0.0, delay: float=0.0, prm: float=0.0):
+        self._type: type_
+        self._index: int = index
+        self._label: str = label
+        self._spill: float = spill   # first P parameter
+        self._delay: float = delay   # second P parameter
+        self._prm: float = prm       # arbitrary parameter
 
     def __str__(self):
         return f'AbstractCommand()'
@@ -43,10 +37,6 @@ class Command(ABC):
         elif item == 9:
             return self._prm
 
-    @abstractmethod
-    def _parse(self):
-        self._cnc_lines = [Line(l) for l in self._lines]
-
     @property
     @abstractmethod
     def disabled(self):
@@ -63,4 +53,9 @@ class Command(ABC):
     @property
     @abstractmethod
     def as_gcode(self):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def from_string(cls, string: str):
         pass
