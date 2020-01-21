@@ -87,3 +87,20 @@ class SonoMidCommand(OneLineCommand):
         inst._type = CommandType.SONO_MID
         inst._label = 'Sono Mid'
         return inst
+
+
+class SonoLowCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.SONO_LOW, index=index, label='Sono Low', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M73 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M73' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.SONO_LOW
+        inst._label = 'Sono Low'
+        return inst

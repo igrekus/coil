@@ -1,4 +1,4 @@
-from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand
+from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand
 
 
 def make_command(text, previous):
