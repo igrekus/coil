@@ -81,6 +81,8 @@ class Command(ABC):
             return self._delay
         elif item == 9:
             return self._prm
+        else:
+            raise IndexError
 
     @property
     @abstractmethod
