@@ -135,7 +135,7 @@ class OneLineCommand(Command, ABC):
 
     @property
     def disabled(self):
-        return 0, 2, 3, 4, 5, 6, 7, 8
+        return 2, 3, 4, 5, 6, 7, 8
 
     @property
     @abstractmethod

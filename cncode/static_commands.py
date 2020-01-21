@@ -1,6 +1,6 @@
 from pygcode import Line
 
-from cncode.bases import Command, CommandType
+from cncode.bases import Command, CommandType, OneLineCommand
 
 
 class FillCommand(Command):
@@ -38,3 +38,22 @@ class FillCommand(Command):
         spill = line1.block.modal_params[1].value
         delay = line1.block.modal_params[2].value * 1000
         return cls(index=index, spill=spill, delay=delay)
+
+
+class WeldCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.WELD, index=index, label='Weld', prm=prm)
+
+    def __str__(self):
+        return f'FillCnCommand(n={self._index} prm={self._prm})'
+
+    @property
+    def as_gcode(self):
+        return 'Weld'
+
+    @classmethod
+    def from_string(cls, string: str):
+        inst = super().from_string(string)
+        inst._type = CommandType.WELD
+        inst._label = 'Weld'
+        return inst
