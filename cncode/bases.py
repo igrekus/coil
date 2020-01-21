@@ -50,7 +50,7 @@ arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 class Command(ABC):
     def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined', spill: float=0.0, delay: float=0.0, prm: float=0.0):
-        self._type: type_
+        self._type: CommandType = type_
         self._index: int = index
         self._label: str = label
         self._spill: float = spill   # first P parameter
