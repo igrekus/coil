@@ -49,7 +49,7 @@ class WeldCommand(OneLineCommand):
 
     @property
     def as_gcode(self):
-        return 'Weld'
+        return f'N{self._index:03d} M70 P{int(self._prm)} P0'
 
     @classmethod
     def from_string(cls, string: str):
