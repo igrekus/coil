@@ -47,6 +47,7 @@ class WeldCommand(OneLineCommand):
 
     @classmethod
     def from_string(cls, string: str):
+        # TODO check if correct class is instantiated from super().from_string() call
         assert 'M70' in string
         inst = super().from_string(string)
         inst._type = CommandType.WELD
