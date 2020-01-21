@@ -1,11 +1,13 @@
 from pyexpect import expect
 
 from cncode import FillCommand, WeldCommand, SonoUpCommand
+from cncode.bases import CommandType
 
 
 def test_fillcommand_constructor():
     fill = FillCommand(1, 1, 1)
 
+    expect(fill.command_type).to_equal(CommandType.FILL)
     expect(fill.length).to_equal(0)
     expect(fill.disabled).to_equal((2, 3, 4, 5, 6, 9))
     expect(fill.is_move).to_equal(False)
@@ -16,6 +18,7 @@ def test_fillcommand_constructor():
 def test_fillcommand_from_string():
     fill = FillCommand.from_string('N001 M501 P1 P.002\nG04 P.002\n')
 
+    expect(fill.command_type).to_equal(CommandType.FILL)
     expect(fill.length).to_equal(0)
     expect(fill.disabled).to_equal((2, 3, 4, 5, 6, 9))
     expect(fill.is_move).to_equal(False)
@@ -26,6 +29,7 @@ def test_fillcommand_from_string():
 def test_weldcommand_constructor():
     weld = WeldCommand(1, 1.1)
 
+    expect(weld.command_type).to_equal(CommandType.WELD)
     expect(weld.length).to_equal(0)
     expect(weld.disabled).to_equal((2, 3, 4, 5, 6, 7, 8))
     expect(weld.is_move).to_equal(False)
@@ -36,6 +40,7 @@ def test_weldcommand_constructor():
 def test_weldcommand_from_string():
     weld = WeldCommand.from_string('N003 M70 P20 P0\n')
 
+    expect(weld.command_type).to_equal(CommandType.WELD)
     expect(weld.length).to_equal(0)
     expect(weld.disabled).to_equal((2, 3, 4, 5, 6, 7, 8))
     expect(weld.is_move).to_equal(False)
@@ -46,6 +51,7 @@ def test_weldcommand_from_string():
 def test_sonoupcommand_constructor():
     sonoup = SonoUpCommand(1, 1.1)
 
+    expect(sonoup.command_type).to_equal(CommandType.SONO_UP)
     expect(sonoup.length).to_equal(0)
     expect(sonoup.disabled).to_equal((2, 3, 4, 5, 6, 7, 8))
     expect(sonoup.is_move).to_equal(False)
@@ -56,6 +62,7 @@ def test_sonoupcommand_constructor():
 def test_sonoupcommand_from_string():
     sonoup = SonoUpCommand.from_string('N004 M71 P20 P0\n')
 
+    expect(sonoup.command_type).to_equal(CommandType.SONO_UP)
     expect(sonoup.length).to_equal(0)
     expect(sonoup.disabled).to_equal((2, 3, 4, 5, 6, 7, 8))
     expect(sonoup.is_move).to_equal(False)

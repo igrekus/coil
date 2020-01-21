@@ -108,6 +108,10 @@ class Command(ABC):
     def from_string(cls, string: str):
         pass
 
+    @property
+    def command_type(self):
+        return self._type
+
 
 class OneLineCommand(Command, ABC):
     def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined', prm: float=0.0):
