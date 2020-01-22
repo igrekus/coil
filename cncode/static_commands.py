@@ -224,3 +224,20 @@ class BrakeOnCommand(OneLineCommand):
         inst._label = 'Brake on'
         return inst
 
+
+class BrakeOffCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.BRAKE_OFF, index=index, label='Brake off', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M81 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M81' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.BRAKE_OFF
+        inst._label = 'Brake off'
+        return inst
+
