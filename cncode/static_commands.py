@@ -258,3 +258,19 @@ class ThermodeMidCommand(OneLineCommand):
         inst._label = 'Thermode Mid'
         return inst
 
+
+class ThermodeUpCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.THERM_UP, index=index, label='Thermode Up', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M83 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M83' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.THERM_UP
+        inst._label = 'Thermode Up'
+        return inst
