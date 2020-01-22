@@ -33,9 +33,9 @@ def make_command(text, previous):
         elif 'M81' in line:
             return BrakeOffCommand(text=text, previous=previous)
         elif 'M82' in line:
-            return ThermMidCommand(text=text, previous=previous)
+            return ThermodeMidCommand(text=text, previous=previous)
         elif 'M83' in line:
-            return ThermUpCommand(text=text, previous=previous)
+            return ThermodeUpCommand(text=text, previous=previous)
     elif length == 2:
         return FillCommand(text=text, previous=previous)
     elif length == 3:
