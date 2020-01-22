@@ -104,3 +104,21 @@ class SonoLowCommand(OneLineCommand):
         inst._type = CommandType.SONO_LOW
         inst._label = 'Sono Low'
         return inst
+
+
+class CutWireCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.CUT_WIRE, index=index, label='Cut wire', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M74 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M74' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.CUT_WIRE
+        inst._label = 'Cut wire'
+        return inst
+
