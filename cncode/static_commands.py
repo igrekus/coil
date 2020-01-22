@@ -139,3 +139,20 @@ class EmbedOnCommand(OneLineCommand):
         inst._label = 'Embed on'
         return inst
 
+
+class EmbedOffCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.EMBED_OFF, index=index, label='Embed off', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M76 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M76' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.EMBED_OFF
+        inst._label = 'Embed off'
+        return inst
+
