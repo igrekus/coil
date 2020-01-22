@@ -190,3 +190,20 @@ class HoldModuleCommand(OneLineCommand):
         inst._label = 'Hold module'
         return inst
 
+
+class ReleaseModuleCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.RELEASE_MODULE, index=index, label='Release module', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M79 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M79' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.RELEASE_MODULE
+        inst._label = 'Release module'
+        return inst
+
