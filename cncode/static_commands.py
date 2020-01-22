@@ -43,6 +43,7 @@ class WeldCommand(OneLineCommand):
 
     @property
     def as_gcode(self):
+        # TODO DRY this
         return f'N{self._index:03d} M70 P{int(self._prm)} P0\n'
 
     @classmethod
