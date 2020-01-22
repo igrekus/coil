@@ -122,3 +122,20 @@ class CutWireCommand(OneLineCommand):
         inst._label = 'Cut wire'
         return inst
 
+
+class EmbedOnCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.EMBED_ON, index=index, label='Embed on', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M75 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M75' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.EMBED_ON
+        inst._label = 'Embed on'
+        return inst
+
