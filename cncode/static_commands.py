@@ -156,3 +156,20 @@ class EmbedOffCommand(OneLineCommand):
         inst._label = 'Embed off'
         return inst
 
+
+class PullWireCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.PULL_WIRE, index=index, label='Pull wire', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M77 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M77' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.PULL_WIRE
+        inst._label = 'Pull wire'
+        return inst
+
