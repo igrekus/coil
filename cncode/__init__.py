@@ -1,4 +1,6 @@
-from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand
+from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand, \
+    CutWireCommand, EmbedOnCommand, EmbedOffCommand, PullWireCommand, HoldModuleCommand, ReleaseModuleCommand, \
+    BrakeOnCommand, BrakeOffCommand, ThermodeMidCommand, ThermodeUpCommand
 
 
 def make_command(text, previous):
