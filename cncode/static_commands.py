@@ -207,3 +207,20 @@ class ReleaseModuleCommand(OneLineCommand):
         inst._label = 'Release module'
         return inst
 
+
+class BrakeOnCommand(OneLineCommand):
+    def __init__(self, index: int=0, prm: float=0.0):
+        super().__init__(type_=CommandType.BRAKE_ON, index=index, label='Brake on', prm=prm)
+
+    @property
+    def as_gcode(self):
+        return f'N{self._index:03d} M80 P{int(self._prm)} P0\n'
+
+    @classmethod
+    def from_string(cls, string: str):
+        assert 'M80' in string
+        inst = super().from_string(string)
+        inst._type = CommandType.BRAKE_ON
+        inst._label = 'Brake on'
+        return inst
+
