@@ -21,20 +21,24 @@ class CommandType(Enum):
         THERM_MID, \
         THERM_UP, \
         LINE_TO, \
-        CW_ARC_TO, \
-        CCW_ARC_TO, \
         LINE_TO_END, \
         LINE_TO_START, \
-        LINE_TO_BOTH = range(22)
+        LINE_TO_BOTH, \
+        CW_ARC_TO_SHORT, \
+        CW_ARC_TO_LONG, \
+        CCW_ARC_TO_SHORT, \
+        CCW_ARC_TO_LONG = range(24)
 
 
 move_commands = [
     CommandType.LINE_TO,
-    CommandType.CW_ARC_TO,
-    CommandType.CCW_ARC_TO,
     CommandType.LINE_TO_END,
     CommandType.LINE_TO_START,
-    CommandType.LINE_TO_BOTH
+    CommandType.LINE_TO_BOTH,
+    CommandType.CW_ARC_TO_SHORT,
+    CommandType.CW_ARC_TO_LONG,
+    CommandType.CCW_ARC_TO_SHORT,
+    CommandType.CCW_ARC_TO_LONG
 ]
 
 
