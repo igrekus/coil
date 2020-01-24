@@ -46,10 +46,6 @@ class ArcType(Enum):
     SHORT, LONG = range(2)
 
 
-class ArcDirection(Enum):
-    CW, CCW = range(2)
-
-
 arc_label = {ArcType.SHORT: 'Short', ArcType.LONG: 'Long'}
 
 
