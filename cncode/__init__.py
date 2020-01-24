@@ -1,6 +1,7 @@
 from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand, \
     CutWireCommand, EmbedOnCommand, EmbedOffCommand, PullWireCommand, HoldModuleCommand, ReleaseModuleCommand, \
     BrakeOnCommand, BrakeOffCommand, ThermodeMidCommand, ThermodeUpCommand
+from cncode.move_commands import LineToCommand
 
 
 def make_command(text, previous):
