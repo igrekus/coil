@@ -1,4 +1,7 @@
-from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand
+from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand, \
+    CutWireCommand, EmbedOnCommand, EmbedOffCommand, PullWireCommand, HoldModuleCommand, ReleaseModuleCommand, \
+    BrakeOnCommand, BrakeOffCommand, ThermodeMidCommand, ThermodeUpCommand
+from cncode.move_commands import LineToCommand
 
 
 def make_command(text, previous):
@@ -31,9 +34,9 @@ def make_command(text, previous):
         elif 'M81' in line:
             return BrakeOffCommand(text=text, previous=previous)
         elif 'M82' in line:
-            return ThermMidCommand(text=text, previous=previous)
+            return ThermodeMidCommand(text=text, previous=previous)
         elif 'M83' in line:
-            return ThermUpCommand(text=text, previous=previous)
+            return ThermodeUpCommand(text=text, previous=previous)
     elif length == 2:
         return FillCommand(text=text, previous=previous)
     elif length == 3:
