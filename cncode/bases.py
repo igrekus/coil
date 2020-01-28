@@ -227,6 +227,9 @@ class MoveCommand(Command, ABC):
     def from_string(cls, string: str):
         pass
 
+    @property
+    def is_move(self):
+        return True
 
     @property
     @abstractmethod
