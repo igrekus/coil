@@ -107,7 +107,7 @@ class Command(ABC):
 
     @classmethod
     @abstractmethod
-    def from_string(cls, string: str):
+    def from_string(cls, string: str, *args, **kwargs):
         pass
 
     @property
@@ -149,7 +149,7 @@ class OneLineCommand(Command, ABC):
         pass
 
     @classmethod
-    def from_string(cls, string: str):
+    def from_string(cls, string: str, *args, **kwargs):
         cnc_lines = [Line(l) for l in string.strip().split('\n')]
         assert len(cnc_lines) == 1
 
@@ -224,7 +224,7 @@ class MoveCommand(Command, ABC):
 
     @classmethod
     @abstractmethod
-    def from_string(cls, string: str):
+    def from_string(cls, string: str, *args, **kwargs):
         pass
 
     @property
