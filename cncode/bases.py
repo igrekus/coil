@@ -165,14 +165,18 @@ class MoveCommand(Command, ABC):
     def __init__(self, type_: CommandType = CommandType.UNDEFINED, index: int=0, label: str='undefined',
                  x: float=0.0, y: float=0.0, r: float=0.0, arc: ArcType=ArcType.SHORT,
                  speed: float=0.0, spill: float=0.0, delay: float=0.0, prm: float=0.0,
-                 prev_gui_x: float=0.0, prev_gui_y: float=0.0, prev_gcode_x: float=0.0, prev_gcode_y: float=0.0):
+                 prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
         super().__init__(type_=type_, index=index, label=label, spill=spill, delay=delay, prm=prm)
         self._r = r
         self._arc = arc
         self._speed = speed
 
-        self._gui_p1 = Point2(prev_gui_x, prev_gui_y)
-        self._gcode_p1 = Point2(prev_gcode_x, prev_gcode_y)
+        if not prev_gui_end:
+            prev_gui_end = Point2()
+        if not prev_gcode_end:
+            prev_gcode_end = Point2()
+        self._gui_p1 = prev_gui_end.copy()
+        self._gcode_p1 = prev_gcode_end.copy()
 
         self._gui_p2 = Point2(x, y)
 
