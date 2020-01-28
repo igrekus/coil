@@ -175,10 +175,6 @@ class MoveCommand(Command, ABC):
         self._gcode_p1 = Point2(prev_gcode_x, prev_gcode_y)
 
         self._gui_p2 = Point2(x, y)
-        self._gcode_p2 = Point2(0, 0)
-
-        self._gui_geometry = list()
-        self._gcode_geometry = list()
 
     def __str__(self):
         return f'AbstractMoveCommand()'
@@ -213,10 +209,26 @@ class MoveCommand(Command, ABC):
 
     @property
     @abstractmethod
+    def gui_geometry(self):
+        pass
+
+    @property
+    @abstractmethod
+    def gcode_geometry(self):
+        pass
+
+    @property
+    @abstractmethod
     def as_gcode(self):
         pass
 
     @classmethod
     @abstractmethod
     def from_string(cls, string: str):
+        pass
+
+
+    @property
+    @abstractmethod
+    def length(self):
         pass
