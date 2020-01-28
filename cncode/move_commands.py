@@ -1,3 +1,4 @@
+from euclid3 import LineSegment2, Point2
 from pygcode import Line
 
 from cncode.bases import MoveCommand, CommandType, ArcType
@@ -5,15 +6,22 @@ from cncode.bases import MoveCommand, CommandType, ArcType
 
 class LineToCommand(MoveCommand):
     def __init__(self, index: int=0, x: float=0.0, y: float=0.0, speed: float=0.0, spill: float=0.0,
-                 prev_gui_x: float=0.0, prev_gui_y: float=0.0, prev_gcode_x: float=0.0, prev_gcode_y: float=0.0):
+                 prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
 
         super().__init__(type_=CommandType.LINE_TO, index=index, label='Line To', x=x, y=y, speed=speed, spill=spill,
-                         prev_gui_x=prev_gui_x, prev_gui_y=prev_gui_y,
-                         prev_gcode_x=prev_gcode_x, prev_gcode_y=prev_gcode_y)
+                         prev_gui_end=prev_gui_end, prev_gcode_end=prev_gcode_end)
 
     def __str__(self):
         return f'{self.__class__.__name__}(x={self._gui_p2.x}, y={self._gui_p2.y}, ' \
                f'speed={self._speed}, spill={self._spill})'
+
+    def __getitem__(self, item):
+        if item == 4:
+            return '*'
+        elif item == 5:
+            return ''
+        else:
+            return super().__getitem__(item)
 
     @property
     def disabled(self):
@@ -21,21 +29,50 @@ class LineToCommand(MoveCommand):
 
     @property
     def as_gcode(self):
-        return 'lol'
-        # sec = self._delay / 1000
-        # return f'N{self._index:03d} M501 P{self._spill} P{sec}\n' \
-        #        f'G04 P{sec}\n'
+        return f'N{self._index:03d} M500 P{self._spill}\n' \
+               f'     F{self._speed:.0f}\n' \
+               f'     G01 X{self.gcode_end_x} Y{self.gcode_end_y} Z0\n'
+
+    @property
+    def gui_geometry(self):
+        return [LineSegment2(self._gui_p1, self._gui_p2)]
+
+    @property
+    def gcode_geometry(self):
+        return self.gui_geometry
+
+    @property
+    def gcode_end_x(self):
+        return self.gcode_geometry[-1].p2.x
+
+    @property
+    def gcode_end_y(self):
+        return self.gcode_geometry[-1].p2.y
+
+    @property
+    def length(self):
+        return sum([g.length for g in self.gcode_geometry])
 
     @classmethod
-    def from_string(cls, string: str):
+    def from_string(cls, string: str, *args, **kwargs):
+        prev_gui_end = kwargs.get('prev_gui_end', Point2())
+        prev_gcode_end = kwargs.get('prev_gcode_end', Point2())
         cnc_lines = [Line(l) for l in string.strip().split('\n')]
-        assert len(cnc_lines) == 2
+        assert len(cnc_lines) == 3
 
-        line1, line2 = cnc_lines
-        assert line1.gcodes[0].word_letter == 'N'
-        assert line2.gcodes[0].word == 'G04'
+        line1, line2, line3 = cnc_lines
 
         index = line1.gcodes[0].number
         spill = line1.block.modal_params[1].value
-        delay = line1.block.modal_params[2].value * 1000
-        return cls(index=index, spill=spill, delay=delay)
+        speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        geom_end_point = Point2(params['X'].value, params['Y'].value)
+
+        x = geom_end_point.x
+        y = geom_end_point.y
+
+        return cls(index=index, x=x, y=y,
+                   speed=speed, spill=spill,
+                   prev_gui_end=prev_gui_end,
+                   prev_gcode_end=prev_gcode_end)
