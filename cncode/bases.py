@@ -219,7 +219,7 @@ class MoveCommand(Command, ABC):
     @property
     @abstractmethod
     def gcode_geometry(self):
-        pass
+        return list()
 
     @property
     @abstractmethod
@@ -236,6 +236,5 @@ class MoveCommand(Command, ABC):
         return True
 
     @property
-    @abstractmethod
     def length(self):
-        pass
+        return sum(g.length for g in self.gcode_geometry)

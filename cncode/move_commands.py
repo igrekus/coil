@@ -54,10 +54,6 @@ class LineToCommand(MoveCommand):
     def gcode_end_y(self):
         return self.gcode_geometry[-1].p2.y
 
-    @property
-    def length(self):
-        return sum(g.length for g in self.gcode_geometry)
-
     @classmethod
     def from_string(cls, string: str, *args, **kwargs):
         prev_gui_end = kwargs.get('prev_gui_end', Point2())
@@ -129,10 +125,6 @@ class LineToWithEndCurveCommand(MoveCommand):
     def gcode_end_y(self):
         return self.gcode_geometry[-1].p2.y
 
-    @property
-    def length(self):
-        return sum(g.length for g in self.gcode_geometry)
-
     @classmethod
     def from_string(cls, string: str, *args, **kwargs):
         prev_gui_end = kwargs.get('prev_gui_end', Point2())
@@ -203,10 +195,6 @@ class CwShortArcToCommand(MoveCommand):
     @property
     def gcode_end_y(self):
         return self.gcode_geometry[-1].p2.y
-
-    @property
-    def length(self):
-        return sum(g.length for g in self.gcode_geometry)
 
     @classmethod
     def from_string(cls, string: str, *args, **kwargs):
