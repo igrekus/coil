@@ -1,4 +1,6 @@
-from euclid3 import LineSegment2, Point2
+import math
+
+from euclid3 import LineSegment2, Point2, Circle
 from pygcode import Line
 
 from cncode.bases import MoveCommand, CommandType, ArcType
@@ -7,6 +9,29 @@ from cncode.bases import MoveCommand, CommandType, ArcType
 # - arc R == distance between points -> long arc
 # - arc R < distance between points, arc == short -> short arc, R = ?
 # - arc R < distance between points, arc == long -> long arc, R = ?
+
+
+class Arc(Circle):
+    def __init__(self, center: Point2, radius: float, p1: Point2, p2: Point2):
+        super().__init__(center=center, radius=radius)
+        self.p1 = p1.copy()
+        self.p2 = p2.copy()
+
+    def __str__(self):
+        return f'Arc(<{self.c.x:.2f}>, <{self.c.y:.2f}>, ' \
+               f'radius={self.r:.2f}, ' \
+               f'start=(<{self.p1.x:.2f}>, <{self.p1.y:.2f}>) ' \
+               f'end=(<{self.p2.x:.2f}>, <{self.p2.y:.2f}>))'
+
+    @property
+    def length(self):
+        b = LineSegment2(self.p1, self.c).length
+        c = LineSegment2(self.p2, self.c).length
+        a = LineSegment2(self.p1, self.p2).length
+        cosa = (pow(b, 2) + pow(c, 2) - pow(a, 2)) / \
+               (2 * b * c)
+        angle = math.acos(cosa)
+        return self.r * angle
 
 
 class LineToCommand(MoveCommand):
@@ -151,26 +176,20 @@ class LineToWithEndCurveCommand(MoveCommand):
 
 
 class CwShortArcToCommand(MoveCommand):
-    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, speed: float=0.0, spill: float=0.0,
+    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, r: float=0.0, speed: float=0.0, spill: float=0.0,
                  prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
 
-        super().__init__(type_=CommandType.LINE_TO_END,
-                         index=index, label='Line To', x=x, y=y, speed=speed, spill=spill,
+        super().__init__(type_=CommandType.CW_ARC_TO_SHORT,
+                         index=index, label='CW Arc To', x=x, y=y, r=r, speed=speed, spill=spill, arc=ArcType.SHORT,
                          prev_gui_end=prev_gui_end, prev_gcode_end=prev_gcode_end)
 
     def __str__(self):
         return f'{self.__class__.__name__}(x={self._gui_p2.x}, y={self._gui_p2.y}, ' \
-               f'r={self._r}, speed={self._speed}, spill={self._spill})'
-
-    def __getitem__(self, item):
-        if item == 5:
-            return ''
-        else:
-            return super().__getitem__(item)
+               f'r={self._r}, arc={self._arc}, speed={self._speed}, spill={self._spill})'
 
     @property
     def disabled(self):
-        return 5, 8, 9
+        return 8, 9
 
     @property
     def as_gcode(self):
@@ -180,12 +199,53 @@ class CwShortArcToCommand(MoveCommand):
 
     @property
     def gui_geometry(self):
-        return [LineSegment2(self._gui_p1, self._gui_p2)]
+        # x1 = self._gui_p1.x
+        # y1 = self._gui_p1.y
+        # x2 = self._gui_p2.x
+        # y2 = self._gui_p2.x
+        #
+        # xc = (x1 + x2) / 2
+        # yc = (y1 + y2) / 2
+        #
+        # dist = math.sqrt(pow(self._r, 2) - (pow(xc - x1, 2) + pow(yc - y1, 2)))
+        #
+        # a = y1 - y2
+        # b = x2 - x1  # CW - minus, CCW - plus
+        #
+        # norm = math.sqrt(a * a + b * b)
+        # an = a / norm
+        # bn = b / norm
+        #
+        # x4 = xc + an * dist
+        # y4 = yc + bn * dist
+
+        # x1, y1 = self._gui_p1.x, self._gui_p1.y
+        # x2, y2 = self._gui_p2.x, self._gui_p2.y
+        # R = self._r
+
+        #---
+
+        x1, y1 = 0,0
+        x2, y2 = 5,5
+        R = 5
+
+        x3 = (x1 + x2) / 2
+        y3 = (y1 + y2) / 2
+
+        d = math.sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2))
+        a = d / 2
+        h = math.sqrt(R * R - a * a)
+
+        x41 = x3 + (h / d) * (y2 - y1)
+        y41 = y3 - (h / d) * (x2 - x1)
+
+        x42 = x3 - (h / d) * (y2 - y1)
+        y42 = y3 + (h / d) * (x2 - x1)
+
+        return [Arc(Point2(x4, y4), self._r, self._gui_p1, self._gui_p2)]
 
     @property
     def gcode_geometry(self):
-        print(self._gui_p1)
-        print(self._gui_p2)
         return self.gui_geometry
 
     @property
