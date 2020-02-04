@@ -195,7 +195,7 @@ class MoveCommand(Command, ABC):
         elif item == 4:
             return self._r
         elif item == 5:
-            return self._arc
+            return self._arc.value
         elif item == 6:
             return self._speed
         elif item == 7:
