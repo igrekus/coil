@@ -197,37 +197,17 @@ class CwShortArcToCommand(MoveCommand):
                f'     F{self._speed:.0f}\n' \
                f'     G01 X{self.gcode_end_x} Y{self.gcode_end_y} Z0\n'
 
+    """
+    N001 M500 P0
+     F12000
+     G02 X5 Y3 Z0 I3.9090046549 J-.8483410916 K0
+    """
+
     @property
     def gui_geometry(self):
-        # x1 = self._gui_p1.x
-        # y1 = self._gui_p1.y
-        # x2 = self._gui_p2.x
-        # y2 = self._gui_p2.x
-        #
-        # xc = (x1 + x2) / 2
-        # yc = (y1 + y2) / 2
-        #
-        # dist = math.sqrt(pow(self._r, 2) - (pow(xc - x1, 2) + pow(yc - y1, 2)))
-        #
-        # a = y1 - y2
-        # b = x2 - x1  # CW - minus, CCW - plus
-        #
-        # norm = math.sqrt(a * a + b * b)
-        # an = a / norm
-        # bn = b / norm
-        #
-        # x4 = xc + an * dist
-        # y4 = yc + bn * dist
-
-        # x1, y1 = self._gui_p1.x, self._gui_p1.y
-        # x2, y2 = self._gui_p2.x, self._gui_p2.y
-        # R = self._r
-
-        #---
-
-        x1, y1 = 0,0
-        x2, y2 = 5,5
-        R = 5
+        x1, y1 = self._gui_p1.x, self._gui_p1.y
+        x2, y2 = self._gui_p2.x, self._gui_p2.y
+        R = self._r
 
         x3 = (x1 + x2) / 2
         y3 = (y1 + y2) / 2
@@ -239,10 +219,11 @@ class CwShortArcToCommand(MoveCommand):
         x41 = x3 + (h / d) * (y2 - y1)
         y41 = y3 - (h / d) * (x2 - x1)
 
-        x42 = x3 - (h / d) * (y2 - y1)
-        y42 = y3 + (h / d) * (x2 - x1)
+        # center to the left of the arc
+        # x42 = x3 - (h / d) * (y2 - y1)
+        # y42 = y3 + (h / d) * (x2 - x1)
 
-        return [Arc(Point2(x4, y4), self._r, self._gui_p1, self._gui_p2)]
+        return [Arc(Point2(x41, y41), self._r, self._gui_p1, self._gui_p2)]
 
     @property
     def gcode_geometry(self):
