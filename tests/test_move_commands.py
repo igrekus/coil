@@ -105,7 +105,6 @@ def test_cwarcshortcommand_constructor():
     expect(com.command_type).to_equal(CommandType.CW_ARC_TO_SHORT)
     expect([com[i] for i in range(10)]).to_equal([1, 'CW Arc To', 5.0, 3.0, 4.0, 0, 12000, 0, '', ''])
     expect(com.is_move).to_equal(True)
-    # expect(com.length).almost_equal(14.14, 0.01)
     expect(com.disabled).to_equal((8, 9))
 
     gui = com.gui_geometry[-1]
@@ -122,4 +121,4 @@ def test_cwarcshortcommand_constructor():
     expect(com.gcode_end_x).to_equal(5.0)
     expect(com.gcode_end_y).to_equal(3.0)
 
-    # expect(com.as_gcode).to_equal('N001 M500 P0\n     F12000\n     G01 X10.0 Y10.0 Z0\n')
+    expect(com.as_gcode).to_equal('N001 M500 P0\n     F12000\n     G02 X5.000 Y3.000 Z0 I3.909 J-0.848 K0\n')
