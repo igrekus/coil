@@ -172,7 +172,7 @@ def test_ccwarcshortcommand_constructor():
     expect(com.gcode_end_x).to_equal(5.0)
     expect(com.gcode_end_y).to_equal(3.0)
 
-    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G02 X5.000 Y3.000 Z0 I1.091 J3.848 K0\n')
+    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G03 X5.000 Y3.000 Z0 I1.091 J3.848 K0\n')
 
 
 def test_ccwarcshortcommand_from_string():
@@ -198,4 +198,4 @@ def test_ccwarcshortcommand_from_string():
     expect(com.gcode_end_x).to_equal(-2.0)
     expect(com.gcode_end_y).to_equal(2.0)
 
-    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G02 X-2.000 Y2.000 Z0 I-2.871 J-0.871 K0\n')
+    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G03 X-2.000 Y2.000 Z0 I-2.871 J-0.871 K0\n')
