@@ -100,7 +100,7 @@ def test_linetocommand_from_string():
 #     expect(com.as_gcode).to_equal('N001 M500 P1.0\n     F12000\n     G01 X0.0 Y5.0 Z0\n')
 
 def test_cwarcshortcommand_constructor():
-    com = CwShortArcToCommand(1, 5.0, 3.0, 4.0, 12000, 0, Point2(0, 0), Point2(0, 0))
+    com = CwShortArcToCommand(1, 5.0, 3.0, 4.0, 12000, 0.0, Point2(0, 0), Point2(0, 0))
 
     expect(com.command_type).to_equal(CommandType.CW_ARC_TO_SHORT)
     expect([com[i] for i in range(10)]).to_equal([1, 'CW Arc To', 5.0, 3.0, 4.0, 0, 12000, 0, '', ''])
@@ -121,7 +121,7 @@ def test_cwarcshortcommand_constructor():
     expect(com.gcode_end_x).to_equal(5.0)
     expect(com.gcode_end_y).to_equal(3.0)
 
-    expect(com.as_gcode).to_equal('N001 M500 P0\n     F12000\n     G02 X5.000 Y3.000 Z0 I3.909 J-0.848 K0\n')
+    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G02 X5.000 Y3.000 Z0 I3.909 J-0.848 K0\n')
 
 
 def test_cwarcshortcommand_from_string():
