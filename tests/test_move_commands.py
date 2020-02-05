@@ -1,8 +1,8 @@
-from euclid3 import LineSegment2, Point2
+from euclid3 import Point2
 from pyexpect import expect
 
-from cncode import LineToCommand, LineToWithEndCurveCommand, CwShortArcToCommand
-from cncode.bases import CommandType, ArcType
+from cncode import LineToCommand, CwShortArcToCommand, CcwShortArcToCommand
+from cncode.bases import CommandType
 from cncode.move_commands import Arc
 
 
