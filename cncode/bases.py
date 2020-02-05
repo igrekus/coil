@@ -189,11 +189,11 @@ class MoveCommand(Command, ABC):
         elif item == 1:
             return self._label
         elif item == 2:
-            return self._gui_p2.x
+            return round(self._gui_p2.x, 1)
         elif item == 3:
-            return self._gui_p2.y
+            return round(self._gui_p2.y, 1)
         elif item == 4:
-            return self._r
+            return round(self._r, 1)
         elif item == 5:
             return self._arc.value
         elif item == 6:
