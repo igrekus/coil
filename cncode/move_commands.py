@@ -193,15 +193,10 @@ class CwShortArcToCommand(MoveCommand):
 
     @property
     def as_gcode(self):
+        center = self.gcode_geometry[-1].c
         return f'N{self._index:03d} M500 P{self._spill}\n' \
                f'     F{self._speed:.0f}\n' \
-               f'     G01 X{self.gcode_end_x} Y{self.gcode_end_y} Z0\n'
-
-    """
-    N001 M500 P0
-     F12000
-     G02 X5 Y3 Z0 I3.9090046549 J-.8483410916 K0
-    """
+               f'     G02 X{self.gcode_end_x:.03f} Y{self.gcode_end_y:.03f} Z0 I{center.x:.03f} J{center.y:.03f} K0\n'
 
     @property
     def gui_geometry(self):
