@@ -246,12 +246,16 @@ class CwShortArcToCommand(MoveCommand):
         speed = line2.gcodes[0].word.value
 
         params = line3.gcodes[0].params
-        geom_end_point = Point2(params['X'].value, params['Y'].value)
+        geom_end_point = Point2(float(params['X'].value), float(params['Y'].value))
+        center_point = Point2(float(params['I'].value), float(params['J'].value))
 
         x = geom_end_point.x
         y = geom_end_point.y
 
-        return cls(index=index, x=x, y=y,
-                   speed=speed, spill=spill,
+        r = math.sqrt(pow(geom_end_point.x - center_point.x, 2) +
+                      pow(geom_end_point.y - center_point.y, 2))
+
+        return cls(index=index, x=x, y=y, r=r, speed=speed, spill=spill,
                    prev_gui_end=prev_gui_end,
                    prev_gcode_end=prev_gcode_end)
+
