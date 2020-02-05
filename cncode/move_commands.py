@@ -277,7 +277,7 @@ class CcwShortArcToCommand(MoveCommand):
         center = self.gcode_geometry[-1].c
         return f'N{self._index:03d} M500 P{self._spill}\n' \
                f'     F{self._speed:.0f}\n' \
-               f'     G02 X{self.gcode_end_x:.03f} Y{self.gcode_end_y:.03f} Z0 I{center.x:.03f} J{center.y:.03f} K0\n'
+               f'     G03 X{self.gcode_end_x:.03f} Y{self.gcode_end_y:.03f} Z0 I{center.x:.03f} J{center.y:.03f} K0\n'
 
     @property
     def gui_geometry(self):
