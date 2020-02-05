@@ -1,6 +1,6 @@
 import math
 
-from euclid3 import LineSegment2, Point2, Circle
+from euclid3 import LineSegment2, Point2, Circle, Ray2
 from pygcode import Line
 
 from cncode.bases import MoveCommand, CommandType, ArcType
@@ -336,3 +336,92 @@ class CcwShortArcToCommand(MoveCommand):
                    prev_gui_end=prev_gui_end,
                    prev_gcode_end=prev_gcode_end)
 
+
+class CwLongArcToCommand(MoveCommand):
+    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, r: float=0.0, speed: float=0.0, spill: float=0.0,
+                 prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
+
+        super().__init__(type_=CommandType.CW_ARC_TO_LONG,
+                         index=index, label='CW Arc To', x=x, y=y, r=r, speed=speed, spill=spill, arc=ArcType.LONG,
+                         prev_gui_end=prev_gui_end, prev_gcode_end=prev_gcode_end)
+
+    def __str__(self):
+        return f'{self.__class__.__name__}(x={self._gui_p2.x}, y={self._gui_p2.y}, ' \
+               f'r={self._r}, arc={self._arc}, speed={self._speed}, spill={self._spill})'
+
+    @property
+    def disabled(self):
+        return 8, 9
+
+    @property
+    def as_gcode(self):
+        arc1, arc2 = self.gcode_geometry
+        return f'N{self._index:03d} M500 P{self._spill}\n' \
+               f'     F{self._speed:.0f}\n' \
+               f'     G02 X{arc1.p2.x:.03f} Y{arc1.p2.y:.03f} Z0 I{arc1.c.x:.03f} J{arc1.c.y:.03f} K0\n' \
+               f'     G02 X{arc2.p2.x:.03f} Y{arc2.p2.y:.03f} Z0 I{arc2.c.x:.03f} J{arc2.c.y:.03f} K0\n' \
+
+    @property
+    def gui_geometry(self):
+        x1, y1 = self._gui_p1.x, self._gui_p1.y
+        x2, y2 = self._gui_p2.x, self._gui_p2.y
+        r = self._r
+
+        xmid = (x1 + x2) / 2
+        ymid = (y1 + y2) / 2
+
+        d = math.sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2))
+        a = d / 2
+        h = math.sqrt(r * r - a * a)
+
+        xcenter = xmid - (h / d) * (y2 - y1)
+        ycenter = ymid + (h / d) * (x2 - x1)
+
+        circle = Circle(Point2(xcenter, ycenter), r)
+        ray = Ray2(Point2(xmid, ymid), Point2(xcenter, ycenter))
+
+        arc_split_point = circle.intersect(ray).p1
+
+        return [
+            Arc(Point2(xcenter, ycenter), self._r, self._gui_p1, arc_split_point),
+            Arc(Point2(xcenter, ycenter), self._r, arc_split_point, self._gui_p2)
+        ]
+
+    @property
+    def gcode_geometry(self):
+        return self.gui_geometry
+
+    @property
+    def gcode_end_x(self):
+        return self.gcode_geometry[-1].p2.x
+
+    @property
+    def gcode_end_y(self):
+        return self.gcode_geometry[-1].p2.y
+
+    @classmethod
+    def from_string(cls, string: str, *args, **kwargs):
+        prev_gui_end = kwargs.get('prev_gui_end', Point2())
+        prev_gcode_end = kwargs.get('prev_gcode_end', Point2())
+        cnc_lines = [Line(l) for l in string.strip().split('\n')]
+        assert len(cnc_lines) == 3
+
+        line1, line2, line3 = cnc_lines
+
+        index = line1.gcodes[0].number
+        spill = line1.block.modal_params[1].value
+        speed = line2.gcodes[0].word.value
+
+        params = line3.gcodes[0].params
+        geom_end_point = Point2(float(params['X'].value), float(params['Y'].value))
+        center_point = Point2(float(params['I'].value), float(params['J'].value))
+
+        x = geom_end_point.x
+        y = geom_end_point.y
+
+        r = math.sqrt(pow(geom_end_point.x - center_point.x, 2) +
+                      pow(geom_end_point.y - center_point.y, 2))
+
+        return cls(index=index, x=x, y=y, r=r, speed=speed, spill=spill,
+                   prev_gui_end=prev_gui_end,
+                   prev_gcode_end=prev_gcode_end)
