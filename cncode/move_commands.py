@@ -214,9 +214,9 @@ class CwShortArcToCommand(MoveCommand):
         x41 = x3 + (h / d) * (y2 - y1)
         y41 = y3 - (h / d) * (x2 - x1)
 
-        # center to the left of the arc
-        # x42 = x3 - (h / d) * (y2 - y1)
-        # y42 = y3 + (h / d) * (x2 - x1)
+        return [Arc(Point2(x41, y41), self._r, self._gui_p1, self._gui_p2)]
+
+    @property
 
         return [Arc(Point2(x41, y41), self._r, self._gui_p1, self._gui_p2)]
 
