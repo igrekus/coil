@@ -404,23 +404,28 @@ class CwLongArcToCommand(MoveCommand):
         prev_gui_end = kwargs.get('prev_gui_end', Point2())
         prev_gcode_end = kwargs.get('prev_gcode_end', Point2())
         cnc_lines = [Line(l) for l in string.strip().split('\n')]
-        assert len(cnc_lines) == 3
+        assert len(cnc_lines) == 4
 
-        line1, line2, line3 = cnc_lines
+        line1, line2, line3, line4 = cnc_lines
 
         index = line1.gcodes[0].number
         spill = line1.block.modal_params[1].value
         speed = line2.gcodes[0].word.value
 
-        params = line3.gcodes[0].params
-        geom_end_point = Point2(float(params['X'].value), float(params['Y'].value))
-        center_point = Point2(float(params['I'].value), float(params['J'].value))
+        params1 = line3.gcodes[0].params
+        params2 = line4.gcodes[0].params
+
+        arc1_end = Point2(float(params1['X'].value), float(params1['Y'].value))
+        arc1_center = Point2(float(params1['I'].value), float(params1['J'].value))
+        arc2_end = Point2(float(params2['X'].value), float(params2['Y'].value))
+        arc2_center = Point2(float(params2['I'].value), float(params2['J'].value))
+
+        geom_end_point = arc2_end
+        r = math.sqrt(pow(geom_end_point.x - arc1_center.x, 2) +
+                      pow(geom_end_point.y - arc1_center.y, 2))
 
         x = geom_end_point.x
         y = geom_end_point.y
-
-        r = math.sqrt(pow(geom_end_point.x - center_point.x, 2) +
-                      pow(geom_end_point.y - center_point.y, 2))
 
         return cls(index=index, x=x, y=y, r=r, speed=speed, spill=spill,
                    prev_gui_end=prev_gui_end,
