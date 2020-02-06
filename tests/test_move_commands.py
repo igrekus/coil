@@ -1,7 +1,7 @@
 from euclid3 import Point2
 from pyexpect import expect
 
-from cncode import LineToCommand, CwShortArcToCommand, CcwShortArcToCommand, CwLongArcToCommand
+from cncode import LineToCommand, CwShortArcToCommand, CcwShortArcToCommand, CwLongArcToCommand, CcwLongArcToCommand
 from cncode.bases import CommandType
 from cncode.move_commands import Arc
 
@@ -269,3 +269,76 @@ def test_cwarclongcommand_from_string():
     expect(com.gcode_end_y).to_equal(2.0)
 
     expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G02 X0.895 Y5.014 Z0 I2.009 J2.228 K0\n     G02 X5.000 Y2.000 Z0 I2.009 J2.228 K0\n')
+
+
+def test_ccwarclongcommand_constructor():
+    com = CcwLongArcToCommand(1, 5.0, 3.0, 4.0, 12000, 0.0, Point2(0, 0), Point2(0, 0))
+
+    expect(com.command_type).to_equal(CommandType.CW_ARC_TO_LONG)
+    expect([com[i] for i in range(10)]).to_equal([1, 'CCW Arc To', 5.0, 3.0, 4.0, 1, 12000, 0, '', ''])
+    expect(com.is_move).to_equal(True)
+    expect(com.disabled).to_equal((8, 9))
+
+    expect(len(com.gui_geometry)).to_equal(2)
+    arc1, arc2 = com.gui_geometry
+    expect(arc1.c.x).almost_equal(3.909, 0.01)
+    expect(arc1.c.y).almost_equal(-0.848, 0.01)
+    expect(arc1.r).almost_equal(4, 0.01)
+    expect(arc1.p1.x).to_equal(0.0)
+    expect(arc1.p1.y).to_equal(0.0)
+    expect(arc1.p2.x).almost_equal(5.967, 0.01)
+    expect(arc1.p2.y).almost_equal(-4.278, 0.01)
+
+    expect(arc2.c.x).almost_equal(3.909, 0.01)
+    expect(arc2.c.y).almost_equal(-0.848, 0.01)
+    expect(arc2.r).almost_equal(4, 0.01)
+    expect(arc2.p1.x).almost_equal(5.967, 0.01)
+    expect(arc2.p1.y).almost_equal(-4.278, 0.01)
+    expect(arc2.p2.x).almost_equal(5.0, 0.01)
+    expect(arc2.p2.y).almost_equal(3.0, 0.01)
+
+    expect(com.length).almost_equal(18.60, 0.01)
+
+    expect(com.gcode_end_x).to_equal(5.0)
+    expect(com.gcode_end_y).to_equal(3.0)
+
+    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G03 X5.967 Y-4.278 Z0 I3.909 J-0.848 K0\n     G03 X5.000 Y3.000 Z0 I3.909 J-0.848 K0\n')
+
+
+def test_ccwarclongcommand_from_string():
+    # 5, 2, 3
+    com = CcwLongArcToCommand.from_string(string='N001 M500 P0\n     F12000\n     G03 X4.1054757135 Y-3.0136892838 Z0 I2.9913036844 J-.2282592111 K0\n     G03 X5 Y2 Z0 I2.9913036844 J-.2282592111 K0\n',
+                                          prev_gui_end=Point2(0, 0), prev_gcode_end=Point2(0, 0))
+
+    expect(com.command_type).to_equal(CommandType.CW_ARC_TO_LONG)
+    expect([com[i] for i in range(10)]).to_equal([1, 'CCW Arc To', 5.0, 2.0, 3.0, 1, 12000, 0, '', ''])
+    expect(com.is_move).to_equal(True)
+    expect(com.disabled).to_equal((8, 9))
+
+    #      G03 X4.1054757135 Y-3.0136892838 Z0 I2.9913036844 J-.2282592111 K0
+    #      G03 X5 Y2 Z0 I2.9913036844 J-.2282592111 K0
+
+    expect(len(com.gui_geometry)).to_equal(2)
+    arc1, arc2 = com.gui_geometry
+    expect(arc1.c.x).almost_equal(2.991, 0.01)
+    expect(arc1.c.y).almost_equal(-0.228, 0.01)
+    expect(arc1.r).almost_equal(3, 0.01)
+    expect(arc1.p1.x).to_equal(0.0)
+    expect(arc1.p1.y).to_equal(0.0)
+    expect(arc1.p2.x).almost_equal(4.105, 0.01)
+    expect(arc1.p2.y).almost_equal(-3.014, 0.01)
+
+    expect(arc2.c.x).almost_equal(2.991, 0.01)
+    expect(arc2.c.y).almost_equal(-0.228, 0.01)
+    expect(arc2.r).almost_equal(3, 0.01)
+    expect(arc2.p1.x).almost_equal(4.105, 0.01)
+    expect(arc2.p1.y).almost_equal(-3.014, 0.01)
+    expect(arc2.p2.x).almost_equal(5.0, 0.01)
+    expect(arc2.p2.y).almost_equal(2.0, 0.01)
+
+    expect(com.length).almost_equal(12.16, 0.01)
+
+    expect(com.gcode_end_x).to_equal(5.0)
+    expect(com.gcode_end_y).to_equal(2.0)
+
+    expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G03 X4.105 Y-3.014 Z0 I2.991 J-0.228 K0\n     G03 X5.000 Y2.000 Z0 I2.991 J-0.228 K0\n')
