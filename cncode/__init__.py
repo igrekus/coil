@@ -3,7 +3,7 @@ from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, Sono
     CutWireCommand, EmbedOnCommand, EmbedOffCommand, PullWireCommand, HoldModuleCommand, ReleaseModuleCommand, \
     BrakeOnCommand, BrakeOffCommand, ThermodeMidCommand, ThermodeUpCommand
 from cncode.move_commands import LineToCommand, LineToWithEndCurveCommand, CwShortArcToCommand, CcwShortArcToCommand, \
-    CwLongArcToCommand
+    CwLongArcToCommand, CcwLongArcToCommand
 
 
 def make_command(text, previous):
