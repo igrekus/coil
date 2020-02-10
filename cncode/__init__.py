@@ -1,7 +1,9 @@
+from cncode.bases import Command
 from cncode.static_commands import FillCommand, WeldCommand, SonoUpCommand, SonoMidCommand, SonoLowCommand, \
     CutWireCommand, EmbedOnCommand, EmbedOffCommand, PullWireCommand, HoldModuleCommand, ReleaseModuleCommand, \
     BrakeOnCommand, BrakeOffCommand, ThermodeMidCommand, ThermodeUpCommand
-from cncode.move_commands import LineToCommand
+from cncode.move_commands import LineToCommand, LineToWithEndCurveCommand, CwShortArcToCommand, CcwShortArcToCommand, \
+    CwLongArcToCommand, CcwLongArcToCommand
 
 
 def make_command(text, previous):
@@ -44,9 +46,9 @@ def make_command(text, previous):
         if 'G01' in line3:
             return LineToCommand(text=text, previous=previous)
         elif 'G02' in line3:
-            return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
+            return CwShortArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CW)
         elif 'G03' in line3:
-            return ArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
+            return CcwShortArcToCommand(text=text, previous=previous, arc_type=ArcType.SHORT, arc_dir=ArcDirection.CCW)
     elif length == 4:
         # long arc = arc + arc
         *_, line3, line4 = lines
