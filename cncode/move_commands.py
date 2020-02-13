@@ -1,6 +1,6 @@
 import math
 
-from euclid3 import LineSegment2, Point2, Circle, Ray2
+from euclid3 import LineSegment2, Point2, Circle, Ray2, Line2, Vector2
 from pygcode import Line
 
 from cncode.bases import MoveCommand, CommandType, ArcType
@@ -105,12 +105,13 @@ class LineToCommand(MoveCommand):
 
 
 class LineToWithEndCurveCommand(MoveCommand):
-    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, speed: float=0.0, spill: float=0.0,
+    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, r: float=0.0, speed: float=0.0, spill: float=0.0,
                  prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
 
         super().__init__(type_=CommandType.LINE_TO_END,
-                         index=index, label='Line To', x=x, y=y, speed=speed, spill=spill,
+                         index=index, label='Line To', x=x, y=y, r=r, speed=speed, spill=spill,
                          prev_gui_end=prev_gui_end, prev_gcode_end=prev_gcode_end)
+        self.next_segment = Line2(self._gui_p2, Point2(x, y - 1.0))
 
     def __str__(self):
         return f'{self.__class__.__name__}(x={self._gui_p2.x}, y={self._gui_p2.y}, ' \
@@ -138,8 +139,22 @@ class LineToWithEndCurveCommand(MoveCommand):
 
     @property
     def gcode_geometry(self):
-        print(self._gui_p1)
-        print(self._gui_p2)
+        gui_line = self.gui_geometry[-1]
+        next_line = self.next_segment
+        arc_command = 'G03' if is_left(gui_line, next_line.p2) else 'G02'
+
+        u: Vector2 = gui_line.v
+        v: Vector2 = next_line.v
+
+        bx = u.x / u.magnitude() + v.x / v.magnitude()
+        by = u.y / u.magnitude() + v.y / v.magnitude()
+
+        b = Vector2(bx, by)
+        b_line = Line2(gui_line.p2, -b)
+
+        print(b)
+        print(b_line)
+
         return self.gui_geometry
 
     @property
@@ -525,3 +540,7 @@ class CcwLongArcToCommand(MoveCommand):
         return cls(index=index, x=x, y=y, r=r, speed=speed, spill=spill,
                    prev_gui_end=prev_gui_end,
                    prev_gcode_end=prev_gcode_end)
+
+
+def is_left(line, c: Point2):
+    return ((line.p2.x - line.p1.x) * (c.y - line.p1.y) - (line.p2.y - line.p1.y) * (c.x - line.p1.x)) > 0

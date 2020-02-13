@@ -19,8 +19,10 @@ if __name__ == '__main__':
 
 # TODO add option to shift selected commands by x,y
 # TODO add option to insert standard chip weld block
-# 
+#
 
+# https://buildmedia.readthedocs.org/media/pdf/euclid/latest/euclid.pdf
+# combine euclid3, svgpathtools, clipper
 # d = {"title": "qt arc", "date": "14/6/2019", "tabs": [{"title": "qgraphicsitem arc - Поиск в Google",
 #                                                        "url": "https://www.google.com/search?q=qgraphicsitem+arc&oq=qgraphicsitem+arc&aqs=chrome..69i57.4945j0j7&sourceid=chrome&ie=UTF-8",
 #                                                        "win": "1090"},
