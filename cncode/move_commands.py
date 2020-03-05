@@ -140,20 +140,46 @@ class LineToWithEndCurveCommand(MoveCommand):
     @property
     def gcode_geometry(self):
         gui_line = self.gui_geometry[-1]
-        next_line = self.next_segment
-        arc_command = 'G03' if is_left(gui_line, next_line.p2) else 'G02'
+        # next_line = self.next_segment
+        next_line = LineSegment2(Point2(7, 12), Point2(10, 5))
+        right_hand = not is_left(gui_line, next_line.p2)
+        arc_command = 'G02' if right_hand else 'G03'
 
-        u: Vector2 = gui_line.v
-        v: Vector2 = next_line.v
+        def get_parallel_lines(line, d):
+            x1, y1 = line.p1
+            x2, y2 = line.p2
 
-        bx = u.x / u.magnitude() + v.x / v.magnitude()
-        by = u.y / u.magnitude() + v.y / v.magnitude()
+            a = y1 - y2
+            b = x2 - x1
+            c = (x1 * y2 - x2 * y1)
 
-        b = Vector2(bx, by)
-        b_line = Line2(gui_line.p2, -b)
+            if b != 0:
+                m = - a / b
+                y0 = -c / b
 
-        print(b)
-        print(b_line)
+                # y = m*x + c + d*sqrt(1+m^2);
+                par_above = lambda xnew: m * xnew + y0 + d * math.sqrt(1 + m * m)
+                par_below = lambda xnew: m * xnew + y0 - d * math.sqrt(1 + m * m)
+
+                line_above = Line2(Point2(x1, par_above(x1)), Point2(x2, par_above(x2)))
+                line_below = Line2(Point2(x1, par_below(x1)), Point2(x2, par_below(x2)))
+            else:
+                line_above = Line2(Point2(x1 + d, y1), Point2(x2 + d, y2))
+                line_below = Line2(Point2(x1 - d, y1), Point2(x2 - d, y2))
+
+            return line_above, line_below
+
+        gui_above, gui_below = get_parallel_lines(gui_line, d=2)
+        next_above, next_below = get_parallel_lines(next_line, d=2)
+
+        intersect1 = gui_above.intersect(next_above)
+        intersect2 = gui_above.intersect(next_below)
+        intersect3 = gui_below.intersect(next_above)
+        intersect4 = gui_below.intersect(next_below)
+
+        inter = intersect4 if right_hand else intersect1
+
+        print('dist')
 
         return self.gui_geometry
 
