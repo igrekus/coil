@@ -164,8 +164,8 @@ class LineToWithEndCurveCommand(MoveCommand):
                 line_above = Line2(Point2(x1, par_above(x1)), Point2(x2, par_above(x2)))
                 line_below = Line2(Point2(x1, par_below(x1)), Point2(x2, par_below(x2)))
             else:
-                line_above = Line2(Point2(x1 + d, y1), Point2(x2 + d, y2))
-                line_below = Line2(Point2(x1 - d, y1), Point2(x2 - d, y2))
+                line_above = Line2(Point2(x1 - d, y1), Point2(x2 - d, y2))
+                line_below = Line2(Point2(x1 + d, y1), Point2(x2 + d, y2))
 
             return line_above, line_below
 
