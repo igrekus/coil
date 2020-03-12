@@ -552,12 +552,12 @@ def get_parallel_lines(line, diameter):
     c = (x1 * y2 - x2 * y1)
 
     if b != 0:
-        m = - a / b
-        y0 = -c / b
+        k = - a / b
+        m = -c / b
 
         # y = m*x + c + d*sqrt(1+m^2);
-        par_above = lambda xnew: m * xnew + y0 + diameter * math.sqrt(1 + m * m)
-        par_below = lambda xnew: m * xnew + y0 - diameter * math.sqrt(1 + m * m)
+        par_above = lambda xnew: k * xnew + m + diameter * math.sqrt(1 + k * k)
+        par_below = lambda xnew: k * xnew + m - diameter * math.sqrt(1 + k * k)
 
         line_above = Line2(Point2(x1, par_above(x1)), Point2(x2, par_above(x2)))
         line_below = Line2(Point2(x1, par_below(x1)), Point2(x2, par_below(x2)))
