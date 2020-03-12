@@ -1,8 +1,6 @@
 import sys
-import pygcode
 
 from PyQt5.QtWidgets import QApplication
-from pygcode import Line, GCodeLinearMove, GCodeArcMoveCW, GCodeArcMoveCCW, GCodeMotion
 
 from mainwindow import MainWindow
 
