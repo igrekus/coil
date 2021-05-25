@@ -3,7 +3,7 @@ from pyexpect import expect
 
 from cncode import LineToCommand, CwShortArcToCommand, CcwShortArcToCommand, CwLongArcToCommand, CcwLongArcToCommand
 from cncode.bases import CommandType
-from cncode.move_commands import Arc
+from cncode.move_commands import Arc, LineToWithEndCurveCommand
 
 
 def test_linetocommand_constructor():
@@ -52,52 +52,6 @@ def test_linetocommand_from_string():
 
     expect(com.as_gcode).to_equal('N001 M500 P1.0\n     F12000\n     G01 X0.0 Y5.0 Z0\n')
 
-
-# def test_linetowithendcurvecommand_constructor():
-#     com = LineToWithEndCurveCommand(1, 10.0, 10.0, 12000, 0, None, None)
-#
-#     # expect(com.command_type).to_equal(CommandType.LINE_TO)
-#     # expect([com[i] for i in range(10)]).to_equal([1, 'Line To', 10.0, 10.0, 2.0, '', 12000, 0, '', ''])
-#     # expect(com.is_move).to_equal(True)
-#     # expect(com.length).almost_equal(14.14, 0.01)
-#     # expect(com.disabled).to_equal((5, 8, 9))
-#
-#     # gui = com.gui_geometry[-1]
-#     # expect(gui.p1).to_equal(Point2(0, 0))
-#     # expect(gui.p2).to_equal(Point2(10, 10))
-#     #
-#     gcode = com.gcode_geometry[-1]
-#     # expect(gcode.p1).to_equal(Point2(0, 0))
-#     # expect(gcode.p2).to_equal(Point2(10, 10))
-#     #
-#     # expect(com.gcode_end_x).to_equal(10.0)
-#     # expect(com.gcode_end_y).to_equal(10.0)
-#     #
-#     # expect(com.as_gcode).to_equal('N001 M500 P0\n     F12000\n     G01 X10.0 Y10.0 Z0\n')
-
-
-# def test_linetowithendcurvecommand_from_string():
-#     com = LineToWithEndCurveCommand.from_string(string='N001 M500 P1\n     F12000\n     G01 X0 Y5 Z0\n',
-#                                                 prev_gui_end=Point2(0, 0), prev_gcode_end=Point2(0, 0))
-#
-#     expect(com.command_type).to_equal(CommandType.LINE_TO)
-#     expect([com[i] for i in range(10)]).to_equal([1, 'Line To', 0, 5.0, '*', '', 12000, 1.0, '', ''])
-#     expect(com.is_move).to_equal(True)
-#     expect(com.length).to_equal(5)
-#     expect(com.disabled).to_equal((5, 8, 9))
-#
-#     gui = com.gui_geometry[-1]
-#     expect(gui.p1).to_equal(Point2(0, 0))
-#     expect(gui.p2).to_equal(Point2(0, 5))
-#
-#     gcode = com.gcode_geometry[-1]
-#     expect(gcode.p1).to_equal(Point2(0, 0))
-#     expect(gcode.p2).to_equal(Point2(0, 5))
-#
-#     expect(com.gcode_end_x).to_equal(0)
-#     expect(com.gcode_end_y).to_equal(5)
-#
-#     expect(com.as_gcode).to_equal('N001 M500 P1.0\n     F12000\n     G01 X0.0 Y5.0 Z0\n')
 
 def test_cwarcshortcommand_constructor():
     com = CwShortArcToCommand(1, 5.0, 3.0, 4.0, 12000, 0.0, Point2(0, 0), Point2(0, 0))
@@ -315,9 +269,6 @@ def test_ccwarclongcommand_from_string():
     expect(com.is_move).to_equal(True)
     expect(com.disabled).to_equal((8, 9))
 
-    #      G03 X4.1054757135 Y-3.0136892838 Z0 I2.9913036844 J-.2282592111 K0
-    #      G03 X5 Y2 Z0 I2.9913036844 J-.2282592111 K0
-
     expect(len(com.gui_geometry)).to_equal(2)
     arc1, arc2 = com.gui_geometry
     expect(arc1.c.x).almost_equal(2.991, 0.01)
@@ -342,3 +293,50 @@ def test_ccwarclongcommand_from_string():
     expect(com.gcode_end_y).to_equal(2.0)
 
     expect(com.as_gcode).to_equal('N001 M500 P0.0\n     F12000\n     G03 X4.105 Y-3.014 Z0 I2.991 J-0.228 K0\n     G03 X5.000 Y2.000 Z0 I2.991 J-0.228 K0\n')
+
+
+def test_linetowithendcurvecommand_constructor():
+    com = LineToWithEndCurveCommand(2, 7.0, 12.0, 2, 12000, 0, Point2(0.0, 5.0), Point2(0.0, 5.0))
+
+    expect(com.command_type).to_equal(CommandType.LINE_TO_END)
+    expect([com[i] for i in range(10)]).to_equal([2, 'Line To', 7.0, 12.0, 2.0, '', 12000, 0, '', ''])
+    expect(com.is_move).to_equal(True)
+    # expect(com.length).almost_equal(14.14, 0.01)
+    # expect(com.disabled).to_equal((5, 8, 9))
+
+    # gui = com.gui_geometry[-1]
+    # expect(gui.p1).to_equal(Point2(0, 0))
+    # expect(gui.p2).to_equal(Point2(10, 10))
+    #
+    gcode = com.gcode_geometry[-1]
+    # expect(gcode.p1).to_equal(Point2(0, 0))
+    # expect(gcode.p2).to_equal(Point2(10, 10))
+    #
+    # expect(com.gcode_end_x).to_equal(10.0)
+    # expect(com.gcode_end_y).to_equal(10.0)
+    #
+    # expect(com.as_gcode).to_equal('N001 M500 P0\n     F12000\n     G01 X10.0 Y10.0 Z0\n')
+
+
+# def test_linetowithendcurvecommand_from_string():
+#     com = LineToWithEndCurveCommand.from_string(string='N001 M500 P1\n     F12000\n     G01 X0 Y5 Z0\n',
+#                                                 prev_gui_end=Point2(0, 0), prev_gcode_end=Point2(0, 0))
+#
+#     expect(com.command_type).to_equal(CommandType.LINE_TO)
+#     expect([com[i] for i in range(10)]).to_equal([1, 'Line To', 0, 5.0, '*', '', 12000, 1.0, '', ''])
+#     expect(com.is_move).to_equal(True)
+#     expect(com.length).to_equal(5)
+#     expect(com.disabled).to_equal((5, 8, 9))
+#
+#     gui = com.gui_geometry[-1]
+#     expect(gui.p1).to_equal(Point2(0, 0))
+#     expect(gui.p2).to_equal(Point2(0, 5))
+#
+#     gcode = com.gcode_geometry[-1]
+#     expect(gcode.p1).to_equal(Point2(0, 0))
+#     expect(gcode.p2).to_equal(Point2(0, 5))
+#
+#     expect(com.gcode_end_x).to_equal(0)
+#     expect(com.gcode_end_y).to_equal(5)
+#
+#     expect(com.as_gcode).to_equal('N001 M500 P1.0\n     F12000\n     G01 X0.0 Y5.0 Z0\n')

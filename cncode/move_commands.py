@@ -1,6 +1,6 @@
 import math
 
-from euclid3 import LineSegment2, Point2, Circle, Ray2
+from euclid3 import LineSegment2, Point2, Circle, Ray2, Line2, Vector2
 from pygcode import Line
 
 from cncode.bases import MoveCommand, CommandType, ArcType
@@ -105,12 +105,13 @@ class LineToCommand(MoveCommand):
 
 
 class LineToWithEndCurveCommand(MoveCommand):
-    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, speed: float=0.0, spill: float=0.0,
+    def __init__(self, index: int=0, x: float=0.0, y: float=0.0, r: float=0.0, speed: float=0.0, spill: float=0.0,
                  prev_gui_end: Point2=None, prev_gcode_end: Point2=None):
 
         super().__init__(type_=CommandType.LINE_TO_END,
-                         index=index, label='Line To', x=x, y=y, speed=speed, spill=spill,
+                         index=index, label='Line To', x=x, y=y, r=r, speed=speed, spill=spill,
                          prev_gui_end=prev_gui_end, prev_gcode_end=prev_gcode_end)
+        self.next_segment = Line2(self._gui_p2, Point2(x, y - 1.0))
 
     def __str__(self):
         return f'{self.__class__.__name__}(x={self._gui_p2.x}, y={self._gui_p2.y}, ' \
@@ -138,8 +139,19 @@ class LineToWithEndCurveCommand(MoveCommand):
 
     @property
     def gcode_geometry(self):
-        print(self._gui_p1)
-        print(self._gui_p2)
+        # gui_line = self.gui_geometry[-1]
+        # next_line = self.next_segment
+
+        gui_line = LineSegment2(Point2(7, 10), Point2(7, 15))
+        next_line = LineSegment2(Point2(7, 15), Point2(0, 20))
+
+        right_hand = not is_left(gui_line, next_line.p2)
+        arc_command = 'G02' if right_hand else 'G03'
+
+        d = 3
+        intersect1, intersect2, intersect3, intersect4 = get_intersects(gui_line, next_line, diameter=d)
+        inter = intersect4 if right_hand else intersect2
+
         return self.gui_geometry
 
     @property
@@ -525,3 +537,43 @@ class CcwLongArcToCommand(MoveCommand):
         return cls(index=index, x=x, y=y, r=r, speed=speed, spill=spill,
                    prev_gui_end=prev_gui_end,
                    prev_gcode_end=prev_gcode_end)
+
+
+def is_left(line, c: Point2):
+    return ((line.p2.x - line.p1.x) * (c.y - line.p1.y) - (line.p2.y - line.p1.y) * (c.x - line.p1.x)) > 0
+
+
+def get_parallel_lines(line, diameter):
+    x1, y1 = line.p1
+    x2, y2 = line.p2
+
+    a = y1 - y2
+    b = x2 - x1
+    c = (x1 * y2 - x2 * y1)
+
+    if b != 0:
+        k = - a / b
+        m = -c / b
+
+        # y = m*x + c + d*sqrt(1+m^2);
+        par_above = lambda xnew: k * xnew + m + diameter * math.sqrt(1 + k * k)
+        par_below = lambda xnew: k * xnew + m - diameter * math.sqrt(1 + k * k)
+
+        line_above = Line2(Point2(x1, par_above(x1)), Point2(x2, par_above(x2)))
+        line_below = Line2(Point2(x1, par_below(x1)), Point2(x2, par_below(x2)))
+    else:
+        line_above = Line2(Point2(x1 - diameter, y1), Point2(x2 - diameter, y2))
+        line_below = Line2(Point2(x1 + diameter, y1), Point2(x2 + diameter, y2))
+
+    return line_above, line_below
+
+
+def get_intersects(line_begin, line_end, diameter):
+    gui_above, gui_below = get_parallel_lines(line_begin, diameter=diameter)
+    next_above, next_below = get_parallel_lines(line_end, diameter=diameter)
+
+    inter1 = gui_above.intersect(next_above)
+    inter2 = gui_above.intersect(next_below)
+    inter3 = gui_below.intersect(next_above)
+    inter4 = gui_below.intersect(next_below)
+    return inter1, inter2, inter3, inter4

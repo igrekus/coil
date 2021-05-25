@@ -169,7 +169,7 @@ class MainWindow(QMainWindow):
         return self._ui.tableGcode.selectionModel().hasSelection()
 
     def _rowsSelected(self):
-        return set([index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes()])
+        return set(index.row() for index in self._ui.tableGcode.selectionModel().selectedIndexes())
 
 # a = {"title": "cnc arc", "date": "28/6/2019", "tabs": [{"title": "gcode g2 - Поиск в Google",
 #                                                         "url": "https://www.google.com/search?q=gcode+g2&oq=gcode+g2&aqs=chrome..69i57j69i60j0l4.12591j0j7&sourceid=chrome&ie=UTF-8",
